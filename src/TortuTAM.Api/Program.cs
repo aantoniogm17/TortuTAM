@@ -22,6 +22,9 @@ if (string.IsNullOrWhiteSpace(connectionString))
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
+builder.Services.AddDbContext<DominioDbContext>(options =>
+    options.UseSqlServer(connectionString));
+
 builder.Services
     .AddIdentityCore<ApplicationUser>(options =>
     {
