@@ -7,6 +7,7 @@ Aplicación de captura de datos de campo para el Programa Binacional de Recupera
 - Backend: ASP.NET Core (C#).
 - Base de datos: SQL Server (el esquema en `database/schema/esquema_base_datos.sql` está en sintaxis MySQL/MariaDB y debe portarse a T-SQL antes de usarse; las modificaciones a partir de ahora se registran como migraciones numeradas en `database/migrations/`, ver plantilla en `database/migrations/README.md`).
 - Cliente: sitio web responsivo (sin apps nativas por ahora), instalable como PWA, con vistas optimizadas para móvil. El boceto original (`docs/referencia/index.html`) es solo referencia visual/UX, no se edita; el código real se construye desde cero en `src/TortuTAM.Web/`, mismo tratamiento que el esquema heredado.
+- Autenticación: ASP.NET Core Identity. Login requiere conexión; la sesión se guarda en el dispositivo para seguir operando offline en campo y sincronizar al recuperar señal. Roles: Usuario normal (captura y puede modificar cualquier ficha de cualquier playa), Administrador (control total sobre datos, catálogos y cuentas de Usuario normal, no gestiona otros Administradores), Superadmin (único que gestiona cuentas de Administrador y el único con acceso a cambios de código/despliegue). Detalle en `docs/planteamiento.md`.
 - Offline: la app debe funcionar sin conexión en campo y sincronizar al recuperar señal.
 - GPS: captura obligatoria de coordenadas en cada toma de datos.
 - Imágenes: la app debe permitir adjuntar fotos a la ficha.
@@ -18,7 +19,6 @@ Aplicación de captura de datos de campo para el Programa Binacional de Recupera
 Documentar como issue antes de tocar catálogos o tablas relacionadas:
 - Especies a cubrir (el esquema actual ya soporta más de una).
 - Número de playas/organizaciones participantes.
-- Roles de usuario (quién captura vs. quién solo consulta/reporta).
 - Qué implica "binacional" en este proyecto.
 
 ## Idioma y tono

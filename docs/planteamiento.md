@@ -11,6 +11,7 @@ TortuTAM digitaliza la captura de datos del Programa Binacional para la Recupera
 | Backend | ASP.NET Core (C#) |
 | Base de datos | SQL Server |
 | Cliente | Sitio web responsivo, sin apps nativas por ahora |
+| Autenticación | ASP.NET Core Identity (hashing de contraseñas, roles y sesión ya resueltos por el framework, sobre tablas SQL normales) |
 | Offline | Captura sin conexión con sincronización posterior al recuperar señal |
 | GPS | Obligatorio en cada toma de datos |
 | Imágenes | La app debe permitir adjuntar fotos a la ficha |
@@ -19,9 +20,19 @@ TortuTAM digitaliza la captura de datos del Programa Binacional para la Recupera
 | Exportación de datos | A futuro, sin especificar formato aún |
 | Cronograma | No definido todavía |
 
+## Usuarios y roles
+
+Autenticación vía ASP.NET Core Identity. El inicio de sesión requiere conexión, pero la sesión (token) queda guardada en el dispositivo para que la app siga funcionando offline en campo; la sincronización de fichas capturadas usa esa misma sesión al recuperar señal.
+
+| Rol | Alcance |
+|---|---|
+| Usuario normal | Captura fichas y puede modificar cualquier ficha de cualquier playa del programa (no está restringido a una playa específica) |
+| Administrador | Control total sobre datos, catálogos y cuentas de Usuario normal. No puede crear ni gestionar cuentas de Administrador |
+| Superadmin | Único rol que gestiona cuentas de Administrador y el único con acceso para hacer cambios a nivel de código/despliegue |
+
 ## Pendientes
 
-- **Alcance de especies, playas y roles**: qué especies cubre la app además de las ya presentes en el esquema, cuántas playas/organizaciones participan, qué significa "binacional" en este proyecto, y qué rol tiene cada tipo de usuario (quién captura vs. quién solo consulta/reporta). Se documentará como issue antes de tocar catálogos o tablas relacionadas.
+- **Alcance de especies, playas**: qué especies cubre la app además de las ya presentes en el esquema, cuántas playas/organizaciones participan, y qué significa "binacional" en este proyecto. Se documentará como issue antes de tocar catálogos o tablas relacionadas.
 - **Modificaciones a la base de datos**: hay cambios pendientes según información y requerimientos ya recibidos del cliente, todavía no consolidados. Se irán resolviendo por issue.
 - **Puerto del esquema a T-SQL**: el esquema heredado (`database/schema/esquema_base_datos.sql`) está en sintaxis MySQL/MariaDB.
 - **Relación `fichas_limpieza` ↔ `fichas`**: existen dos caminos (la llave foránea `ficha_anidacion_id` y el emparejamiento por corral+nido usado en `vw_estatus_nidos`); falta decidir si se deja solo la FK como fuente de verdad.
