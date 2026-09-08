@@ -18,6 +18,9 @@ secrets.json
 *.ldf
 *.ndf
 
+# Fotos de fichas guardadas en filesystem local (desarrollo)
+src/TortuTAM.Api/App_Data/
+
 # Sistema operativo
 .DS_Store
 Thumbs.db

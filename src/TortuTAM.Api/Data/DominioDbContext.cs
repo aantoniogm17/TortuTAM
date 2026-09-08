@@ -13,6 +13,12 @@ public class DominioDbContext(DbContextOptions<DominioDbContext> options) : DbCo
 
     public DbSet<CatUsoNido> UsoNido => Set<CatUsoNido>();
 
+    public DbSet<Ficha> Fichas => Set<Ficha>();
+
+    public DbSet<Marca> Marcas => Set<Marca>();
+
+    public DbSet<FichaFoto> FichaFotos => Set<FichaFoto>();
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
@@ -54,6 +60,84 @@ public class DominioDbContext(DbContextOptions<DominioDbContext> options) : DbCo
             entity.HasKey(u => u.Codigo);
             entity.Property(u => u.Codigo).HasColumnName("codigo");
             entity.Property(u => u.Descripcion).HasColumnName("descripcion").HasMaxLength(60).IsRequired();
+        });
+
+        builder.Entity<Ficha>(entity =>
+        {
+            // trg_fichas_actualizado_en (migración 0007) es un trigger AFTER UPDATE;
+            // sin declararlo aquí, EF intenta usar la cláusula OUTPUT en el UPDATE y
+            // SQL Server la rechaza por la presencia del trigger.
+            entity.ToTable("fichas", tb => tb.HasTrigger("trg_fichas_actualizado_en"));
+            entity.HasKey(f => f.Id);
+            entity.Property(f => f.Id).HasColumnName("id");
+            entity.Property(f => f.NumeroFicha).HasColumnName("numero_ficha").HasMaxLength(20).IsRequired();
+            entity.HasIndex(f => f.NumeroFicha).IsUnique();
+            entity.Property(f => f.PlayaId).HasColumnName("playa_id");
+            entity.Property(f => f.Estaca).HasColumnName("estaca").HasMaxLength(20);
+            entity.Property(f => f.Zona).HasColumnName("zona").HasMaxLength(40);
+            entity.Property(f => f.Fecha).HasColumnName("fecha").HasColumnType("date");
+            entity.Property(f => f.EspecieCodigo).HasColumnName("especie_codigo").HasMaxLength(5);
+            entity.Property(f => f.Sexo).HasColumnName("sexo").HasMaxLength(2);
+            entity.Property(f => f.AccionCodigo).HasColumnName("accion_codigo");
+            entity.Property(f => f.HoraA).HasColumnName("hora_a").HasColumnType("time");
+            entity.Property(f => f.HoraBColecta).HasColumnName("hora_b_colecta").HasColumnType("time");
+            entity.Property(f => f.HoraCSiembra).HasColumnName("hora_c_siembra").HasColumnType("time");
+            entity.Property(f => f.UsoNidoCodigo).HasColumnName("uso_nido_codigo");
+            entity.Property(f => f.Corral).HasColumnName("corral").HasMaxLength(20);
+            entity.Property(f => f.NumeroNido).HasColumnName("numero_nido").HasMaxLength(20);
+            entity.Property(f => f.HuevosColectados).HasColumnName("huevos_colectados");
+            entity.Property(f => f.HuevosRotos).HasColumnName("huevos_rotos");
+            entity.Property(f => f.PosicionCodigo).HasColumnName("posicion_codigo");
+            entity.Property(f => f.Latitud).HasColumnName("latitud").HasColumnType("decimal(9,6)");
+            entity.Property(f => f.Longitud).HasColumnName("longitud").HasColumnType("decimal(9,6)");
+            entity.Property(f => f.Formulo).HasColumnName("formulo").HasMaxLength(10);
+            entity.Property(f => f.Observaciones).HasColumnName("observaciones");
+            entity.Property(f => f.TumoresPresentes).HasColumnName("tumores_presentes");
+            entity.Property(f => f.BioMuescaPuntaLargaCm).HasColumnName("bio_muesca_punta_larga_cm").HasColumnType("decimal(5,1)");
+            entity.Property(f => f.BioPuntaMuescaCm).HasColumnName("bio_punta_muesca_cm").HasColumnType("decimal(5,1)");
+            entity.Property(f => f.BioMuescaMuescaCm).HasColumnName("bio_muesca_muesca_cm").HasColumnType("decimal(5,1)");
+            entity.Property(f => f.BioAnchoCm).HasColumnName("bio_ancho_cm").HasColumnType("decimal(5,1)");
+            entity.Property(f => f.TemperaturaC).HasColumnName("temperatura_c").HasColumnType("decimal(4,1)");
+            entity.Property(f => f.IdempotencyKey).HasColumnName("idempotency_key").HasMaxLength(100);
+            entity.HasIndex(f => f.IdempotencyKey).IsUnique().HasFilter("[idempotency_key] IS NOT NULL");
+            entity.Property(f => f.CreadoEn).HasColumnName("creado_en").ValueGeneratedOnAdd();
+            entity.Property(f => f.ActualizadoEn).HasColumnName("actualizado_en").ValueGeneratedOnAddOrUpdate();
+
+            entity.HasMany(f => f.Marcas)
+                .WithOne(m => m.Ficha)
+                .HasForeignKey(m => m.FichaId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<Marca>(entity =>
+        {
+            entity.ToTable("marcas");
+            entity.HasKey(m => m.Id);
+            entity.Property(m => m.Id).HasColumnName("id");
+            entity.Property(m => m.FichaId).HasColumnName("ficha_id");
+            entity.Property(m => m.Aleta).HasColumnName("aleta").HasMaxLength(10).IsRequired();
+            entity.Property(m => m.Pit).HasColumnName("pit").HasMaxLength(30);
+            entity.Property(m => m.NumeroMarca).HasColumnName("marca").HasMaxLength(30);
+            entity.Property(m => m.Leyenda).HasColumnName("leyenda").HasMaxLength(80);
+            entity.Property(m => m.NuevaORecap).HasColumnName("nueva_o_recap").HasMaxLength(1);
+            entity.Property(m => m.CicatrizMarca).HasColumnName("cicatriz_marca");
+            entity.Property(m => m.Verifico).HasColumnName("verifico");
+            entity.HasIndex(m => new { m.FichaId, m.Aleta }).IsUnique();
+        });
+
+        builder.Entity<FichaFoto>(entity =>
+        {
+            entity.ToTable("ficha_fotos");
+            entity.HasKey(x => x.Id);
+            entity.Property(x => x.Id).HasColumnName("id");
+            entity.Property(x => x.FichaId).HasColumnName("ficha_id");
+            entity.Property(x => x.RutaRelativa).HasColumnName("ruta_relativa").HasMaxLength(260).IsRequired();
+            entity.Property(x => x.CreadoEn).HasColumnName("creado_en").ValueGeneratedOnAdd();
+
+            entity.HasOne<Ficha>()
+                .WithMany()
+                .HasForeignKey(x => x.FichaId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

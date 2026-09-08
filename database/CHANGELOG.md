@@ -19,3 +19,5 @@
 | 0013 | 2026-09-07 | Crea vista `vw_estatus_nidos`. |
 | 0014 | 2026-09-07 | Crea índices de apoyo (fecha, playa, PIT, corral/nido). |
 | 0015 | 2026-09-07 | Agrega columna `temperatura_c` a `fichas`. |
+| 0016 | 2026-09-08 | Agrega columna `idempotency_key` a `fichas` (índice único filtrado) para sincronización offline sin duplicados. |
+| 0017 | 2026-09-08 | Crea `ficha_fotos` (fotos adjuntas a la ficha de anidación). |

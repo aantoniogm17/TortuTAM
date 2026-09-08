@@ -49,6 +49,18 @@ builder.Services.AddOptions<JwtOptions>()
 builder.Services.AddOptions<IdentitySeedOptions>()
     .Bind(builder.Configuration.GetSection(IdentitySeedOptions.SectionName));
 
+var fichasFotosPath = builder.Configuration[$"{StorageOptions.SectionName}:FichasFotosPath"];
+if (string.IsNullOrWhiteSpace(fichasFotosPath))
+{
+    throw new InvalidOperationException(
+        "Falta configurar Storage:FichasFotosPath (appsettings, user-secrets o variable de entorno).");
+}
+
+builder.Services.AddOptions<StorageOptions>()
+    .Bind(builder.Configuration.GetSection(StorageOptions.SectionName));
+
+builder.Services.AddSingleton<IAlmacenamientoFotos, AlmacenamientoFotosLocal>();
+
 builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
 
 var jwtSection = builder.Configuration.GetSection(JwtOptions.SectionName);
