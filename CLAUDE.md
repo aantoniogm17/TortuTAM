@@ -46,3 +46,12 @@ Usar estos subagentes para las tareas correspondientes en lugar de resolverlo to
 ## Flujo de trabajo
 - No crear el repositorio de GitHub ni hacer push hasta que el usuario lo indique explícitamente.
 - Confirmar antes de acciones difíciles de revertir (force-push, reset --hard, eliminar ramas, etc.).
+
+## Ramas
+- Nunca trabajar directo sobre `main`. Todo issue se trabaja en una rama propia, creada desde `main` actualizado.
+- Plantilla de nombre: `tipo/numero-issue-slug-corto`, todo en minúsculas y con guiones.
+  - `tipo`: `feature` (funcionalidad nueva), `fix` (corrección de bug), `docs` (documentación), `chore` (mantenimiento, config, dependencias), `refactor` (cambio interno sin cambiar comportamiento).
+  - `numero-issue`: número del issue de GitHub que la rama resuelve.
+  - `slug-corto`: 2-4 palabras que describan el cambio.
+  - Ejemplos: `feature/12-catalogo-especies`, `fix/8-relacion-fichas-limpieza`, `docs/5-actualiza-readme`.
+- El PR que cierra el issue se abre desde esa rama hacia `main`; la rama se elimina después de fusionar.
