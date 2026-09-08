@@ -34,6 +34,10 @@ Ejemplos:
 
 Cada migración aplicada se agrega también como una línea en [`../CHANGELOG.md`](../CHANGELOG.md).
 
+## Cómo se aplican
+
+Los scripts no se ejecutan a mano. El backend usa **DbUp** para aplicar automáticamente, al iniciar la API, cualquier migración de esta carpeta que todavía no se haya corrido en esa base de datos; DbUp lleva su propio registro de qué scripts ya se aplicaron, así que nunca hay que recordar en qué punto se quedó cada ambiente ni correr algo dos veces.
+
 ## Estado actual
 
 Todavía no hay migraciones en esta carpeta. El esquema base heredado vive en [`../schema/esquema_base_datos.sql`](../schema/esquema_base_datos.sql) (sintaxis MySQL/MariaDB, pendiente de portar a T-SQL). Las modificaciones a partir de aquí se trabajan por issue y se registran como migraciones numeradas.
