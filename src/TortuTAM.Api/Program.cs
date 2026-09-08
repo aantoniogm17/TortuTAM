@@ -91,6 +91,9 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+var dbUpLogger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("TortuTAM.Api.DatabaseMigrator");
+DatabaseMigrator.ApplyPendingMigrations(connectionString, dbUpLogger);
+
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
