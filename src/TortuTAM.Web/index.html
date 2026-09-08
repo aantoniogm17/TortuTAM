@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Programa Binacional · Tortuga Lora</title>
 <link rel="icon" href="img/icon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0C2A27">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -61,6 +63,11 @@
         Mapa de nidos
       </button>
     </nav>
+
+    <div class="sync-indicator" id="syncIndicator" role="status" aria-live="polite">
+      <span class="sync-dot" aria-hidden="true"></span>
+      <span class="sync-text" id="syncText">En línea · Todo sincronizado</span>
+    </div>
 
     <p class="sidebar-footer">Los registros de campo se administran en la base de datos compartida del proyecto.</p>
   </aside>
@@ -762,6 +769,7 @@
 </div>
 
 <script src="js/api.js"></script>
+<script src="js/sync-queue.js"></script>
 <script src="js/catalogos.js"></script>
 <script src="js/ficha-nueva.js"></script>
 <script src="js/fichas.js"></script>
@@ -770,5 +778,6 @@
 <script src="js/panel.js"></script>
 <script src="js/mapa-nidos.js"></script>
 <script src="js/nav.js"></script>
+<script src="js/pwa.js"></script>
 </body>
 </html>

@@ -1,0 +1,20 @@
+{
+  "name": "Programa Binacional · Tortuga Lora",
+  "short_name": "Tortuga Lora",
+  "description": "Captura de datos de campo del Programa Binacional de Recuperación de la Tortuga Lora: fichas de anidación, marcado por aleta, limpieza de nido y varamientos.",
+  "lang": "es",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0C2A27",
+  "theme_color": "#0C2A27",
+  "icons": [
+    {
+      "src": "img/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

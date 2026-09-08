@@ -90,8 +90,10 @@
     getUsoNido: function(){ return request('/catalogos/uso-nido'); },
     getCategoriasConteo: function(){ return request('/catalogos/categorias-conteo'); },
 
-    crearFicha: function(payload){
-      return request('/fichas', { method:'POST', body: payload });
+    // headers es opcional; js/sync-queue.js (#15) lo usa para reenviar
+    // Idempotency-Key al reintentar una ficha encolada sin conexion.
+    crearFicha: function(payload, headers){
+      return request('/fichas', { method:'POST', body: payload, headers: headers });
     },
 
     listarFichas: function(filtros){

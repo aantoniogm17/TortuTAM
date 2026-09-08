@@ -11,6 +11,14 @@
   window.TortuTAM.limpiezas.refrescar (definido cuando la subvista de listado
   se activo al menos una vez), se llama para que el listado quede al dia sin
   acoplar ambos archivos directamente.
+
+  Cola offline (issue #15, ver js/sync-queue.js): si el POST falla por falta
+  de conexion, la limpieza se encola en IndexedDB y se muestra un aviso de
+  "guardado, pendiente de sincronizar" en vez del banner de error; los
+  errores reales del servidor (datos invalidos, etc.) siguen mostrando el
+  banner de error como antes. POST /api/limpiezas no soporta Idempotency-Key
+  todavia, asi que la cola se apoya en que numero_ficha es unico: un 409 al
+  reintentar significa que ya se habia sincronizado antes.
 */
 (function(){
   var form = document.getElementById('limpiezaForm');
@@ -422,6 +430,10 @@
     return 'no se pudo guardar, sin conexion o el servidor no respondio.';
   }
 
+  function esFallaDeRed(err){
+    return !(err && typeof err.status === 'number');
+  }
+
   /* ---------------- Reset ---------------- */
 
   function resetForm(){
@@ -474,6 +486,18 @@
       }
     }).catch(function(err){
       toggleSubmitting(false);
+
+      var syncQueue = window.TortuTAM && window.TortuTAM.syncQueue;
+      if(esFallaDeRed(err) && syncQueue){
+        syncQueue.encolar('limpieza', payload, []).then(function(){
+          setStatus('Sin conexion: la limpieza de la ficha ' + payload.numeroFicha + ' se guardo en este dispositivo y se sincronizara automaticamente cuando haya señal.', 'warning');
+          resetForm();
+        }).catch(function(){
+          setStatus('No se pudo guardar la limpieza ni dejarla lista para sincronizar despues: ' + mensajeErrorGuardado(err), 'error');
+        });
+        return;
+      }
+
       setStatus('No se pudo guardar la limpieza: ' + mensajeErrorGuardado(err), 'error');
     });
   });

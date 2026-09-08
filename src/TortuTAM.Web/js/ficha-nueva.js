@@ -12,9 +12,12 @@
   la validacion, los catalogos, el selector de posicion, la geolocalizacion
   y el manejo de fotos se comparten sin repetir codigo ni marcado.
 
-  Fuera de alcance aqui: la cola offline (guardar en IndexedDB/localStorage
-  y reintentar al recuperar conexion) es del issue #15. Si el guardado
-  falla, solo se muestra un error claro sin limpiar el formulario.
+  Cola offline (issue #15, ver js/sync-queue.js): solo aplica al crear una
+  ficha nueva, no al editar. Si el POST falla por falta de conexion, el
+  registro se encola en IndexedDB junto con sus fotos y se muestra un aviso
+  de "guardado, pendiente de sincronizar" en vez del banner de error; si el
+  servidor respondio con un error real (datos invalidos, etc.), se sigue
+  mostrando el banner de error como antes.
 */
 (function(){
   var form = document.getElementById('fichaForm');
@@ -390,6 +393,10 @@
     return 'no se pudo guardar, sin conexion o el servidor no respondio.';
   }
 
+  function esFallaDeRed(err){
+    return !(err && typeof err.status === 'number');
+  }
+
   function subirFotosSiHay(ficha){
     if(!fotos.length){ return Promise.resolve({ fallidas: 0 }); }
     var fichaId = ficha && ficha.id;
@@ -565,6 +572,18 @@
       });
     }).catch(function(err){
       toggleSubmitting(false);
+
+      var syncQueue = window.TortuTAM && window.TortuTAM.syncQueue;
+      if(!esEdicion && esFallaDeRed(err) && syncQueue){
+        syncQueue.encolar('ficha', payload, fotos).then(function(){
+          setStatus('Sin conexion: la ficha ' + payload.numeroFicha + ' se guardo en este dispositivo y se sincronizara automaticamente cuando haya señal.', 'warning');
+          resetForm();
+        }).catch(function(){
+          setStatus('No se pudo guardar la ficha ni dejarla lista para sincronizar despues: ' + mensajeErrorGuardado(err), 'error');
+        });
+        return;
+      }
+
       setStatus((esEdicion ? 'No se pudo guardar los cambios: ' : 'No se pudo guardar la ficha: ') + mensajeErrorGuardado(err), 'error');
     });
   });
