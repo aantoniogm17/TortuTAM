@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="css/layout.css">
 <link rel="stylesheet" href="css/forms.css">
 <link rel="stylesheet" href="css/listado.css">
+<link rel="stylesheet" href="css/panel.css">
 </head>
 <body>
 
@@ -63,7 +64,33 @@
 
   <main class="main" id="main-content">
     <section class="view is-active" id="view-panel" data-view="panel" aria-labelledby="heading-panel">
-      <div class="view-header"><h1 id="heading-panel">Panel</h1></div>
+      <div class="view-header">
+        <h1 id="heading-panel">Panel</h1>
+        <p class="view-subtitle">Resumen de la temporada: fichas, huevos colectados y avance de limpieza de nidos.</p>
+      </div>
+
+      <div class="status-banner" id="panelStatus" role="status" aria-live="polite"></div>
+
+      <div class="stat-grid" id="panelStatGrid">
+        <div class="stat-card"><div class="num" id="statFichas">…</div><div class="lbl">Fichas registradas</div></div>
+        <div class="stat-card"><div class="num" id="statHuevos">…</div><div class="lbl">Huevos colectados</div></div>
+        <div class="stat-card"><div class="num" id="statNidos">…</div><div class="lbl">Nidos en corral</div></div>
+        <div class="stat-card"><div class="num" id="statPromedio">…</div><div class="lbl">Promedio de huevos por nido</div></div>
+        <div class="stat-card"><div class="num" id="statLimpiezas">…</div><div class="lbl">Nidos con limpieza registrada</div></div>
+        <div class="stat-card"><div class="num" id="statCrias">…</div><div class="lbl">Crias vivas contabilizadas</div></div>
+        <div class="stat-card"><div class="num" id="statExito">…</div><div class="lbl">Exito de eclosion promedio</div></div>
+      </div>
+
+      <div class="panel-grid">
+        <div class="card">
+          <h3>Huevos colectados por playa</h3>
+          <div id="panelBarsByPlaya"></div>
+        </div>
+        <div class="card">
+          <h3>Ultimas fichas capturadas</h3>
+          <div id="panelRecentList"></div>
+        </div>
+      </div>
     </section>
 
     <section class="view" id="view-nueva" data-view="nueva" aria-labelledby="heading-nueva">
@@ -701,6 +728,7 @@
 <script src="js/fichas.js"></script>
 <script src="js/limpieza-nueva.js"></script>
 <script src="js/limpiezas.js"></script>
+<script src="js/panel.js"></script>
 <script src="js/nav.js"></script>
 </body>
 </html>

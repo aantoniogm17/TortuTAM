@@ -122,6 +122,10 @@
 
     obtenerLimpieza: function(id){
       return request('/limpiezas/' + id);
+    },
+
+    obtenerEstadisticasPanel: function(limite){
+      return request('/panel/estadisticas' + buildQueryString({ limite: limite }));
     }
   };
 })();
