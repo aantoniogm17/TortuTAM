@@ -54,4 +54,20 @@ public class CatalogosController(DominioDbContext dominioDb) : ControllerBase
 
         return Ok(usoNido);
     }
+
+    [HttpGet("categorias-conteo")]
+    public async Task<ActionResult<IReadOnlyList<CategoriaConteoResponse>>> CategoriasConteo(CancellationToken cancellationToken)
+    {
+        var categoriasConteo = await dominioDb.CategoriasConteo
+            .OrderBy(c => c.Codigo)
+            .Select(c => new CategoriaConteoResponse(
+                c.Codigo,
+                c.Descripcion,
+                c.SoloTotal,
+                c.CuentaCriaViva,
+                c.ExcluirDeHuevosTotales))
+            .ToListAsync(cancellationToken);
+
+        return Ok(categoriasConteo);
+    }
 }
