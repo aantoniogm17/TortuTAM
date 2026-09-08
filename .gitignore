@@ -1,0 +1,34 @@
+# Build / IDE de .NET
+bin/
+obj/
+*.user
+.vs/
+*.suo
+
+# Secretos y configuración local
+appsettings.Development.json
+appsettings.Local.json
+*.env
+secrets.json
+*.pfx
+*.pem
+
+# Base de datos local
+*.mdf
+*.ldf
+*.ndf
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs y temporales
+*.log
+logs/
+
+# Editor
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json

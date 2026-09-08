@@ -1,0 +1,1616 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Programa Binacional · Tortuga Lora</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  :root{
+    --ocean-deep:#0C2A27;
+    --ocean-mid:#12463F;
+    --ocean-line:#1D5C51;
+    --sand:#F3ECD9;
+    --sand-dark:#E1D3AE;
+    --paper:#FBF8EF;
+    --amber:#C08A32;
+    --amber-deep:#9C6B22;
+    --coral:#AE4A30;
+    --ink:#182420;
+    --ink-soft:#4C5A54;
+    --line:#D8CDAE;
+    --radius-card: 3px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Work Sans', sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{
+    font-family:'Fraunces', serif;
+    color:var(--ocean-deep);
+    margin:0;
+  }
+  button, input, select, textarea{font-family:inherit; font-size:15px;}
+  a{color:inherit;}
+
+  /* ---------- Layout shell ---------- */
+  .app{
+    display:flex;
+    min-height:100vh;
+  }
+  .sidebar{
+    width:230px;
+    flex-shrink:0;
+    background:var(--ocean-deep);
+    color:var(--sand);
+    padding:26px 20px;
+    display:flex;
+    flex-direction:column;
+    gap:28px;
+  }
+  .brand{display:flex; gap:12px; align-items:flex-start;}
+  .brand-mark{width:34px; height:34px; flex-shrink:0; margin-top:2px;}
+  .brand-text .name{font-family:'Fraunces',serif; font-size:16.5px; line-height:1.25; color:var(--sand); font-weight:600;}
+  .brand-text .sub{font-size:11.5px; color:#9FB6AC; margin-top:4px; letter-spacing:.02em;}
+
+  nav.primary-nav{display:flex; flex-direction:column; gap:2px;}
+  .nav-item{
+    display:flex; align-items:center; gap:10px;
+    padding:10px 12px;
+    border-radius:2px;
+    color:#CDE0D8;
+    cursor:pointer;
+    font-size:14.5px;
+    border-left:2px solid transparent;
+    transition:background .15s ease, color .15s ease;
+  }
+  .nav-item svg{width:16px; height:16px; opacity:.85; flex-shrink:0;}
+  .nav-item:hover{background:rgba(255,255,255,.06); color:#fff;}
+  .nav-item.active{background:rgba(255,255,255,.09); color:#fff; border-left-color:var(--amber);}
+
+  .sidebar-footer{margin-top:auto; font-size:11.5px; color:#7E9A8F; line-height:1.5;}
+
+  .main{
+    flex:1;
+    min-width:0;
+    padding:34px 40px 60px;
+  }
+  .topline{
+    display:flex; justify-content:space-between; align-items:flex-end;
+    gap:16px; margin-bottom:26px; flex-wrap:wrap;
+  }
+  .topline h1{font-size:26px; font-weight:600;}
+  .topline .folio-badge{
+    font-size:12.5px; color:var(--ink-soft);
+  }
+  .btn{
+    display:inline-flex; align-items:center; gap:7px;
+    padding:9px 16px;
+    border-radius:2px;
+    border:1px solid var(--ocean-deep);
+    background:var(--ocean-deep);
+    color:var(--sand);
+    cursor:pointer;
+    font-size:14px; font-weight:500;
+    transition:transform .1s ease, background .15s ease;
+  }
+  .btn:hover{background:var(--ocean-mid);}
+  .btn:active{transform:translateY(1px);}
+  .btn.ghost{background:transparent; color:var(--ocean-deep); border-color:var(--line);}
+  .btn.ghost:hover{background:var(--sand-dark);}
+  .btn.danger{background:transparent; color:var(--coral); border-color:var(--coral);}
+  .btn.danger:hover{background:#F3E4DE;}
+  .btn.small{padding:6px 11px; font-size:13px;}
+
+  /* ---------- Dashboard ---------- */
+  .stat-grid{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:30px;
+  }
+  .stat-card{
+    background:var(--sand);
+    border:1px solid var(--line);
+    padding:18px 18px 16px;
+  }
+  .stat-card .num{font-family:'Fraunces',serif; font-size:32px; color:var(--ocean-deep); font-weight:600; line-height:1;}
+  .stat-card .lbl{font-size:12.5px; color:var(--ink-soft); margin-top:8px;}
+
+  .panel-grid{display:grid; grid-template-columns:1.3fr 1fr; gap:16px;}
+  .card{
+    background:#fff;
+    border:1px solid var(--line);
+    padding:20px 22px;
+  }
+  .card h3{font-size:15px; font-weight:600; margin-bottom:14px;}
+  .bar-row{display:flex; align-items:center; gap:10px; margin-bottom:9px; font-size:13px;}
+  .bar-row .bar-label{width:78px; flex-shrink:0; color:var(--ink-soft); font-variant-numeric:tabular-nums;}
+  .bar-track{flex:1; height:9px; background:var(--sand-dark); position:relative; border-radius:1px;}
+  .bar-fill{height:100%; background:var(--ocean-mid);}
+  .bar-val{width:26px; text-align:right; font-size:12.5px; color:var(--ink-soft);}
+
+  .recent-item{
+    display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--sand-dark); font-size:13.5px;
+  }
+  .recent-item:last-child{border-bottom:none;}
+  .recent-item .meta{color:var(--ink-soft); font-size:12px;}
+
+  /* ---------- Table ---------- */
+  .toolbar{
+    display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; align-items:center;
+  }
+  .toolbar input[type=text], .toolbar select{
+    padding:8px 11px; border:1px solid var(--line); background:#fff; border-radius:2px; color:var(--ink);
+  }
+  .toolbar input[type=text]{min-width:200px; flex:1;}
+  table{width:100%; border-collapse:collapse; background:#fff;}
+  thead th{
+    text-align:left; font-size:11.5px; font-weight:600; color:var(--ink-soft);
+    padding:10px 12px; border-bottom:2px solid var(--ocean-deep);
+    white-space:nowrap;
+  }
+  tbody td{
+    padding:11px 12px; border-bottom:1px solid var(--sand-dark); font-size:13.5px; vertical-align:middle;
+  }
+  tbody tr:hover{background:var(--sand);}
+  .pill{
+    display:inline-block; padding:2px 8px; border-radius:20px; font-size:11.5px;
+    background:var(--sand-dark); color:var(--ocean-deep); font-weight:500;
+  }
+  .table-scroll{overflow-x:auto; border:1px solid var(--line);}
+  .row-actions{display:flex; gap:6px;}
+  .icon-btn{
+    background:none; border:none; cursor:pointer; color:var(--ink-soft); padding:4px;
+  }
+  .icon-btn:hover{color:var(--ocean-deep);}
+  .empty-state{
+    text-align:center; padding:60px 20px; color:var(--ink-soft);
+  }
+  .empty-state .em-mark{font-size:34px; margin-bottom:10px;}
+
+  /* ---------- Form ---------- */
+  .form-section{
+    background:#fff; border:1px solid var(--line); padding:22px 24px; margin-bottom:16px;
+  }
+  .form-section h3{
+    font-size:14px; font-weight:600; text-transform:none; color:var(--amber-deep);
+    padding-bottom:10px; margin-bottom:16px; border-bottom:1px solid var(--sand-dark);
+    display:flex; align-items:center; gap:8px;
+  }
+  .field-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:14px;}
+  .field-grid.cols-3{grid-template-columns:repeat(3,1fr);}
+  .field-grid.cols-2{grid-template-columns:repeat(2,1fr);}
+  .field{display:flex; flex-direction:column; gap:5px;}
+  .field label{font-size:12px; color:var(--ink-soft); font-weight:500;}
+  .field input, .field select, .field textarea{
+    padding:9px 10px; border:1px solid var(--line); border-radius:2px; background:var(--paper);
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{
+    outline:2px solid var(--amber); outline-offset:0; background:#fff;
+  }
+  .field textarea{resize:vertical; min-height:64px;}
+  .fin-columns{display:grid; grid-template-columns:1fr 1fr; gap:22px;}
+  .fin-columns .fin-col h4{font-size:13px; color:var(--ocean-deep); margin-bottom:12px; font-weight:600;}
+  .radio-row{display:flex; gap:14px; align-items:center; margin-top:4px;}
+  .radio-row label{display:flex; align-items:center; gap:5px; font-size:13px; color:var(--ink); font-weight:400;}
+  .form-actions{display:flex; gap:10px; justify-content:flex-end; margin-top:6px;}
+  .hint{font-size:11.5px; color:var(--ink-soft); margin-top:-6px; margin-bottom:14px;}
+
+  /* ---------- Detail drawer ---------- */
+  .overlay{
+    position:fixed; inset:0; background:rgba(10,20,18,.45); display:none; align-items:stretch; justify-content:flex-end; z-index:50;
+  }
+  .overlay.open{display:flex;}
+  .drawer{
+    width:460px; max-width:92vw; background:var(--paper); height:100%; overflow-y:auto; padding:28px 26px;
+    box-shadow:-6px 0 24px rgba(0,0,0,.15);
+  }
+  .drawer-head{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;}
+  .drawer-head h2{font-size:22px;}
+  .close-x{background:none; border:none; font-size:20px; color:var(--ink-soft); cursor:pointer; line-height:1;}
+  .detail-block{margin:20px 0;}
+  .detail-block h4{font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:var(--amber-deep); margin-bottom:10px; font-weight:600;}
+  .kv-grid{display:grid; grid-template-columns:1fr 1fr; gap:9px 14px;}
+  .kv{font-size:13.5px;}
+  .kv .k{color:var(--ink-soft); font-size:11.5px;}
+  .kv .v{margin-top:1px;}
+
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(8px);
+    background:var(--ocean-deep); color:var(--sand); padding:11px 20px; border-radius:2px; font-size:13.5px;
+    opacity:0; pointer-events:none; transition:opacity .2s ease, transform .2s ease; z-index:100;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+  .mobile-topbar{display:none;}
+
+  /* ---------- Mapa ---------- */
+  #nestMap{ width:100%; height:520px; border:1px solid var(--line); background:var(--sand); }
+  .map-legend{
+    display:flex; gap:18px; flex-wrap:wrap; margin-bottom:14px; font-size:13px; color:var(--ink-soft);
+  }
+  .map-legend .dot{display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:middle;}
+  .leaflet-popup-content{font-family:'Work Sans', sans-serif; font-size:13px;}
+  .leaflet-popup-content b{font-family:'Fraunces', serif; font-size:14.5px; color:var(--ocean-deep);}
+  .popup-row{display:flex; justify-content:space-between; gap:14px; padding:2px 0;}
+  .popup-row .k{color:var(--ink-soft);}
+  .map-side-list{max-height:520px; overflow-y:auto; border:1px solid var(--line); background:#fff;}
+  .map-side-item{
+    padding:12px 14px; border-bottom:1px solid var(--sand-dark); cursor:pointer; font-size:13px;
+  }
+  .map-side-item:hover{background:var(--sand);}
+  .map-side-item .title{font-weight:600; color:var(--ocean-deep); display:flex; justify-content:space-between; align-items:center; gap:8px;}
+  .map-side-item .sub{color:var(--ink-soft); margin-top:2px; font-size:12px;}
+  .map-columns{display:grid; grid-template-columns:1fr 280px; gap:14px; align-items:start;}
+
+  /* ---------- Selector visual de posición (como el diagrama de la ficha) ---------- */
+  .pos-picker{display:grid; grid-template-columns:repeat(4,1fr); gap:10px;}
+  .pos-card{
+    border:1.5px solid var(--line); background:var(--paper); padding:10px 8px 8px; text-align:center;
+    cursor:pointer; border-radius:2px; transition:border-color .15s ease, background .15s ease;
+  }
+  .pos-card:hover{border-color:var(--amber);}
+  .pos-card.active{border-color:var(--ocean-deep); background:#fff; box-shadow:inset 0 0 0 1px var(--ocean-deep);}
+  .pos-card svg{width:100%; height:34px;}
+  .pos-card .pos-num{font-family:'Fraunces',serif; font-weight:600; color:var(--ocean-deep); font-size:15px; margin-top:4px;}
+  .pos-card .pos-range{font-size:10.5px; color:var(--ink-soft); margin-top:1px;}
+
+  /* ---------- Diagrama de biometrías del caparazón ---------- */
+  .bio-diagram{display:flex; align-items:center; gap:18px; margin-bottom:16px; flex-wrap:wrap;}
+  .bio-diagram svg{width:180px; height:130px; flex-shrink:0;}
+  .bio-diagram-legend{font-size:12px; color:var(--ink-soft); line-height:1.9;}
+  .bio-diagram-legend span{display:inline-block; width:10px; height:2px; margin-right:6px; vertical-align:middle;}
+
+  /* ---------- Chips de condiciones del nido (íconos) ---------- */
+  .cond-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px;}
+  .cond-item{border:1px solid var(--line); padding:10px 12px; background:var(--paper);}
+  .cond-item .cond-head{display:flex; align-items:center; gap:8px; font-size:13px; font-weight:500; margin-bottom:8px;}
+  .cond-item svg{width:18px; height:18px; color:var(--amber-deep); flex-shrink:0;}
+  .chip-toggle{display:flex; gap:6px;}
+  .chip-toggle button{
+    flex:1; padding:6px 0; border:1px solid var(--line); background:#fff; cursor:pointer; font-size:12.5px; color:var(--ink-soft);
+    border-radius:2px;
+  }
+  .chip-toggle button.active-si{background:var(--coral); border-color:var(--coral); color:#fff;}
+  .chip-toggle button.active-no{background:var(--ocean-mid); border-color:var(--ocean-mid); color:#fff;}
+
+  /* ---------- Fila de conteo ilustrada ---------- */
+  .conteo-icon{width:20px; height:20px; flex-shrink:0; color:var(--amber-deep); vertical-align:middle; margin-right:6px;}
+
+  /* ---------- Ubicación ---------- */
+  .locate-row{display:flex; gap:10px; align-items:flex-end;}
+  .locate-row .field{flex:1;}
+  .btn.locate{padding:9px 14px; white-space:nowrap;}
+  .geo-status{font-size:12px; color:var(--ink-soft); margin-top:6px;}
+  .mini-map{width:100%; height:160px; border:1px solid var(--line); margin-top:10px; display:none;}
+
+  /* ---------- Responsive ---------- */
+  @media (max-width:980px){
+    .stat-grid{grid-template-columns:repeat(2,1fr);}
+    .panel-grid{grid-template-columns:1fr;}
+    .field-grid{grid-template-columns:repeat(2,1fr);}
+    .fin-columns{grid-template-columns:1fr;}
+    .map-columns{grid-template-columns:1fr;}
+    .map-side-list{max-height:260px;}
+  }
+  @media (max-width:760px){
+    .app{flex-direction:column;}
+    .sidebar{
+      width:100%; flex-direction:row; align-items:center; padding:14px 16px; gap:14px;
+      position:sticky; top:0; z-index:40;
+    }
+    .brand-text .sub{display:none;}
+    nav.primary-nav{flex-direction:row; gap:4px; overflow-x:auto;}
+    .nav-item{padding:8px 10px; white-space:nowrap; border-left:none; border-bottom:2px solid transparent;}
+    .nav-item.active{border-left:none; border-bottom-color:var(--amber);}
+    .sidebar-footer{display:none;}
+    .main{padding:22px 16px 50px;}
+    .field-grid{grid-template-columns:1fr 1fr;}
+    .field-grid.cols-3{grid-template-columns:1fr 1fr;}
+    .stat-grid{grid-template-columns:1fr 1fr;}
+    .topline h1{font-size:21px;}
+    .drawer{width:100%; max-width:100%;}
+    .pos-picker{grid-template-columns:1fr 1fr;}
+    .cond-grid{grid-template-columns:1fr 1fr;}
+    #nestMap{height:360px;}
+    .locate-row{flex-direction:column; align-items:stretch;}
+  }
+  @media (max-width:480px){
+    .field-grid, .field-grid.cols-3, .field-grid.cols-2{grid-template-columns:1fr;}
+    .stat-grid{grid-template-columns:1fr 1fr;}
+    .toolbar input[type=text]{min-width:100%;}
+    .cond-grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 48 48" fill="none">
+        <ellipse cx="24" cy="26" rx="13" ry="11" fill="#C08A32"/>
+        <path d="M24 15c-3 0-5 2-5 2s2 2 5 2 5-2 5-2-2-2-5-2z" fill="#F3ECD9"/>
+        <path d="M13 20c-3-1-6 0-6 0s1 3 4 4" stroke="#F3ECD9" stroke-width="1.6" fill="none"/>
+        <path d="M35 20c3-1 6 0 6 0s-1 3-4 4" stroke="#F3ECD9" stroke-width="1.6" fill="none"/>
+        <path d="M14 34c-2 2-5 2-5 2s1-3 3-5" stroke="#F3ECD9" stroke-width="1.6" fill="none"/>
+        <path d="M34 34c2 2 5 2 5 2s-1-3-3-5" stroke="#F3ECD9" stroke-width="1.6" fill="none"/>
+        <path d="M17 20l3 5-3 5M31 20l-3 5 3 5M20 17l1 5-1 6M28 17l-1 5 1 6" stroke="#EADFC2" stroke-width="1"/>
+      </svg>
+      <div class="brand-text">
+        <div class="name">Programa Binacional<br>Tortuga Lora</div>
+        <div class="sub">Anidación · Marcado · Varamientos</div>
+      </div>
+    </div>
+    <nav class="primary-nav" id="primaryNav">
+      <div class="nav-item" data-view="panel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="8" height="8"/><rect x="13" y="3" width="8" height="5"/><rect x="13" y="10" width="8" height="11"/><rect x="3" y="13" width="8" height="8"/></svg>Panel</div>
+      <div class="nav-item" data-view="nueva"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg>Nueva ficha</div>
+      <div class="nav-item" data-view="fichas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Fichas</div>
+      <div class="nav-item" data-view="limpieza"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg>Limpieza de nido</div>
+      <div class="nav-item" data-view="mapa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 20l-6-3V4l6 3 6-3 6 3v13l-6-3-6 3z"/><path d="M9 4v13M15 7v13"/></svg>Mapa de nidos</div>
+    </nav>
+    <div class="sidebar-footer">No. de ficha impreso se mantiene como folio físico de campo. Los registros se guardan en la base de datos compartida del proyecto.</div>
+  </aside>
+
+  <main class="main">
+
+    <!-- ===================== PANEL ===================== -->
+    <section id="view-panel">
+      <div class="topline">
+        <h1>Panel de temporada</h1>
+        <div class="folio-badge" id="lastSync">—</div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card"><div class="num" id="statFichas">0</div><div class="lbl">Fichas registradas</div></div>
+        <div class="stat-card"><div class="num" id="statHuevos">0</div><div class="lbl">Huevos colectados</div></div>
+        <div class="stat-card"><div class="num" id="statNidos">0</div><div class="lbl">Nidos en corral</div></div>
+        <div class="stat-card"><div class="num" id="statPromedio">0</div><div class="lbl">Promedio huevos / nido</div></div>
+        <div class="stat-card"><div class="num" id="statLimpiezas">0</div><div class="lbl">Nidos con limpieza registrada</div></div>
+        <div class="stat-card"><div class="num" id="statCrias">0</div><div class="lbl">Crías vivas contabilizadas</div></div>
+        <div class="stat-card"><div class="num" id="statExito">—</div><div class="lbl">Éxito de eclosión promedio</div></div>
+      </div>
+
+      <div class="panel-grid">
+        <div class="card">
+          <h3>Huevos colectados por playa</h3>
+          <div id="barsByPlaya"></div>
+        </div>
+        <div class="card">
+          <h3>Últimas fichas capturadas</h3>
+          <div id="recentList"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== NUEVA FICHA ===================== -->
+    <section id="view-nueva" style="display:none;">
+      <div class="topline">
+        <h1 id="formTitle">Nueva ficha de anidación</h1>
+        <button class="btn ghost small" id="cancelEditBtn" style="display:none;">Cancelar edición</button>
+      </div>
+
+      <form id="fichaForm">
+        <input type="hidden" id="f_id">
+
+        <div class="form-section">
+          <h3>Datos generales</h3>
+          <div class="field-grid">
+            <div class="field"><label>No. de ficha</label><input type="text" id="f_numero" placeholder="15681" required></div>
+            <div class="field"><label>Playa</label><input type="text" id="f_playa" placeholder="MIR" required></div>
+            <div class="field"><label>Estaca</label><input type="text" id="f_estaca" placeholder="19.3"></div>
+            <div class="field"><label>Zona</label><input type="text" id="f_zona"></div>
+          </div>
+          <br>
+          <div class="field-grid">
+            <div class="field"><label>Fecha</label><input type="date" id="f_fecha" required></div>
+            <div class="field"><label>Especie</label><input type="text" id="f_especie" placeholder="Código de especie"></div>
+            <div class="field"><label>Sexo</label>
+              <select id="f_sexo"><option value="">—</option><option value="H">Hembra (H)</option><option value="M">Macho (M)</option><option value="ND">No determinado (ND)</option></select>
+            </div>
+            <div class="field"><label>Formuló (iniciales)</label><input type="text" id="f_formulo" placeholder="JA"></div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Ubicación del nido</h3>
+          <div class="locate-row">
+            <div class="field"><label>Latitud</label><input type="number" step="0.000001" id="f_lat" placeholder="22.2553"></div>
+            <div class="field"><label>Longitud</label><input type="number" step="0.000001" id="f_lng" placeholder="-97.8611"></div>
+            <button type="button" class="btn ghost locate" id="f_locateBtn">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+              Usar mi ubicación
+            </button>
+          </div>
+          <div class="geo-status" id="f_geoStatus">Toca el botón parado junto al nido, o captura las coordenadas con un GPS de mano.</div>
+          <div id="f_miniMap" class="mini-map"></div>
+        </div>
+
+        <div class="form-section">
+          <h3>Acción, horarios y uso de nido</h3>
+          <div class="field-grid">
+            <div class="field"><label>Acción</label>
+              <select id="f_accion"><option value="">—</option></select>
+            </div>
+            <div class="field"><label>Uso de nido</label>
+              <select id="f_uso_nido"><option value="">—</option></select>
+            </div>
+            <div class="field"><label>Corral</label><input type="text" id="f_corral"></div>
+            <div class="field"><label>Núm. nido</label><input type="text" id="f_numero_nido"></div>
+          </div>
+          <br>
+          <div class="field-grid cols-3">
+            <div class="field"><label>Hora A (arribo)</label><input type="time" id="f_hora_a"></div>
+            <div class="field"><label>Hora B (colecta)</label><input type="time" id="f_hora_b"></div>
+            <div class="field"><label>Hora C (siembra)</label><input type="time" id="f_hora_c"></div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Huevos</h3>
+          <div class="field-grid cols-3">
+            <div class="field"><label>Huevos colectados</label><input type="number" min="0" id="f_huevos_colectados"></div>
+            <div class="field"><label>Huevos rotos</label><input type="number" min="0" id="f_huevos_rotos"></div>
+          </div>
+          <br>
+          <div class="field">
+            <label>Posición (distancia a vegetación)</label>
+            <div class="pos-picker" id="posPicker">
+              <div class="pos-card" data-pos="1">
+                <svg viewBox="0 0 60 34"><path d="M6 26 Q30 30 54 8" stroke="#4C5A54" stroke-width="1.5" fill="none"/><circle cx="10" cy="24" r="4" fill="#12463F"/></svg>
+                <div class="pos-num">1</div><div class="pos-range">&lt; 1 cm</div>
+              </div>
+              <div class="pos-card" data-pos="2">
+                <svg viewBox="0 0 60 34"><path d="M6 26 Q30 30 54 8" stroke="#4C5A54" stroke-width="1.5" fill="none"/><circle cx="18" cy="21" r="4" fill="#12463F"/></svg>
+                <div class="pos-num">2</div><div class="pos-range">1–4 cm</div>
+              </div>
+              <div class="pos-card" data-pos="3">
+                <svg viewBox="0 0 60 34"><path d="M6 26 Q30 30 54 8" stroke="#4C5A54" stroke-width="1.5" fill="none"/><circle cx="32" cy="16" r="4" fill="#12463F"/></svg>
+                <div class="pos-num">3</div><div class="pos-range">4–10 cm</div>
+              </div>
+              <div class="pos-card" data-pos="4">
+                <svg viewBox="0 0 60 34"><path d="M6 26 Q30 30 54 8" stroke="#4C5A54" stroke-width="1.5" fill="none"/><circle cx="47" cy="11" r="4" fill="#12463F"/></svg>
+                <div class="pos-num">4</div><div class="pos-range">&gt; 10 cm</div>
+              </div>
+            </div>
+            <input type="hidden" id="f_posicion">
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Marcado</h3>
+          <div class="fin-columns">
+            <div class="fin-col">
+              <h4>⟨ Aleta izquierda</h4>
+              <div class="field-grid cols-2">
+                <div class="field"><label>PIT</label><input type="text" id="f_izq_pit"></div>
+                <div class="field"><label>Marca</label><input type="text" id="f_izq_marca"></div>
+              </div><br>
+              <div class="field"><label>Leyenda</label><input type="text" id="f_izq_leyenda"></div><br>
+              <div class="field"><label>Cicatriz de marca</label>
+                <div class="radio-row">
+                  <label><input type="radio" name="izq_cicatriz" value="si"> Sí</label>
+                  <label><input type="radio" name="izq_cicatriz" value="no" checked> No</label>
+                </div>
+              </div>
+            </div>
+            <div class="fin-col">
+              <h4>Aleta derecha ⟩</h4>
+              <div class="field-grid cols-2">
+                <div class="field"><label>PIT</label><input type="text" id="f_der_pit"></div>
+                <div class="field"><label>Marca</label><input type="text" id="f_der_marca"></div>
+              </div><br>
+              <div class="field"><label>Leyenda</label><input type="text" id="f_der_leyenda"></div><br>
+              <div class="field"><label>Cicatriz de marca</label>
+                <div class="radio-row">
+                  <label><input type="radio" name="der_cicatriz" value="si"> Sí</label>
+                  <label><input type="radio" name="der_cicatriz" value="no" checked> No</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Biometrías del caparazón</h3>
+          <div class="bio-diagram">
+            <svg viewBox="0 0 180 130">
+              <ellipse cx="90" cy="65" rx="55" ry="42" fill="#EDE3CC" stroke="#4C5A54" stroke-width="1.4"/>
+              <path d="M90 23 L90 107" stroke="#C08A32" stroke-width="1.6" stroke-dasharray="3 3"/>
+              <path d="M45 65 L135 65" stroke="#AE4A30" stroke-width="1.6" stroke-dasharray="3 3"/>
+              <path d="M62 30 Q90 20 118 30" stroke="#12463F" stroke-width="1.6" fill="none"/>
+              <circle cx="90" cy="23" r="2.4" fill="#12463F"/>
+              <circle cx="90" cy="107" r="2.4" fill="#12463F"/>
+              <circle cx="45" cy="65" r="2.4" fill="#AE4A30"/>
+              <circle cx="135" cy="65" r="2.4" fill="#AE4A30"/>
+            </svg>
+            <div class="bio-diagram-legend">
+              <div><span style="background:#C08A32;"></span>Muesca–punta / punta–muesca (largo)</div>
+              <div><span style="background:#AE4A30;"></span>Muesca–muesca / ancho</div>
+              <div><span style="background:#12463F;"></span>Puntos de referencia de medición</div>
+            </div>
+          </div>
+          <div class="hint">Medidas estándar tomadas entre muescas (m) y puntas (p) del caparazón, en centímetros.</div>
+          <div class="field-grid">
+            <div class="field"><label>Muesca–punta más larga (cm)</label><input type="number" step="0.1" id="f_bio_mp"></div>
+            <div class="field"><label>Punta–muesca (cm)</label><input type="number" step="0.1" id="f_bio_pm"></div>
+            <div class="field"><label>Muesca–muesca (cm)</label><input type="number" step="0.1" id="f_bio_mm"></div>
+            <div class="field"><label>Ancho (cm)</label><input type="number" step="0.1" id="f_bio_ancho"></div>
+          </div>
+          <br>
+          <div class="field">
+            <label><input type="checkbox" id="f_tumores"> Presencia de tumores / fibropapiloma</label>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Observaciones</h3>
+          <div class="field">
+            <textarea id="f_observaciones" placeholder="Notas de campo…"></textarea>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn ghost" id="resetFormBtn">Limpiar</button>
+          <button type="submit" class="btn">Guardar ficha</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ===================== FICHAS ===================== -->
+    <section id="view-fichas" style="display:none;">
+      <div class="topline">
+        <h1>Fichas registradas</h1>
+        <button class="btn small" id="goNewBtn">+ Nueva ficha</button>
+      </div>
+
+      <div class="toolbar">
+        <input type="text" id="searchInput" placeholder="Buscar por No. de ficha, playa, PIT…">
+        <select id="filterPlaya"><option value="">Todas las playas</option></select>
+        <select id="filterAccion"><option value="">Todas las acciones</option></select>
+      </div>
+
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>No. Ficha</th><th>Fecha</th><th>Playa</th><th>Estaca</th><th>Especie</th>
+              <th>Acción</th><th>Huevos</th><th>Corral</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="fichasTableBody"></tbody>
+        </table>
+      </div>
+      <div class="empty-state" id="emptyState" style="display:none;">
+        <div class="em-mark">🐢</div>
+        No hay fichas que coincidan con la búsqueda.
+      </div>
+    </section>
+
+    <!-- ===================== LIMPIEZA DE NIDO ===================== -->
+    <section id="view-limpieza" style="display:none;">
+      <div class="topline">
+        <h1>Limpieza de nido</h1>
+        <div class="folio-badge">Exhumación y éxito de eclosión</div>
+      </div>
+
+      <div class="toolbar" style="margin-bottom:22px;">
+        <button class="btn small" id="tabLimpiezaNueva" data-sub="nueva">+ Nueva limpieza</button>
+        <button class="btn ghost small" id="tabLimpiezaLista" data-sub="lista">Ver registros</button>
+      </div>
+
+      <!-- --- Subvista: nueva limpieza --- -->
+      <div id="sub-limpieza-nueva">
+        <form id="limpiezaForm">
+          <input type="hidden" id="l_id">
+
+          <div class="form-section">
+            <h3>Datos generales</h3>
+            <div class="field-grid">
+              <div class="field"><label>No. de ficha</label><input type="text" id="l_numero" placeholder="10933" required></div>
+              <div class="field"><label>Playa</label><input type="text" id="l_playa" placeholder="MIR"></div>
+              <div class="field"><label>Corral</label><input type="text" id="l_corral"></div>
+              <div class="field"><label>Nido</label><input type="text" id="l_nido"></div>
+            </div>
+            <br>
+            <div class="field-grid">
+              <div class="field"><label>Fecha 1er. emergencia</label><input type="date" id="l_fecha_emergencia"></div>
+              <div class="field"><label>Fecha de limpieza</label><input type="date" id="l_fecha_limpieza" required></div>
+              <div class="field"><label>Especie</label><input type="text" id="l_especie" placeholder="Código de especie"></div>
+              <div class="field"><label>Formuló (iniciales)</label><input type="text" id="l_formulo" placeholder="JA"></div>
+            </div>
+            <br>
+            <div class="field">
+              <label>Uso de nido</label>
+              <select id="l_uso_nido"><option value="">—</option></select>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Ubicación (opcional)</h3>
+            <div class="hint">Si el nido ya tiene coordenadas registradas en su ficha de anidación, puedes dejar esto en blanco — el mapa usará esa ubicación automáticamente.</div>
+            <div class="locate-row">
+              <div class="field"><label>Latitud</label><input type="number" step="0.000001" id="l_lat" placeholder="22.2553"></div>
+              <div class="field"><label>Longitud</label><input type="number" step="0.000001" id="l_lng" placeholder="-97.8611"></div>
+              <button type="button" class="btn ghost locate" id="l_locateBtn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+                Usar mi ubicación
+              </button>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Conteo de crías y huevos</h3>
+            <div class="hint">Captura sólo los valores que aparecen en la ficha física; deja en blanco lo que no aplique. TOTALES se calcula automáticamente si no lo indicas.</div>
+            <div class="table-scroll">
+              <table id="conteoTable">
+                <thead>
+                  <tr><th>Categoría</th><th>Normales</th><th>Albina</th><th>Deforme</th><th>Albinas y deformes</th><th>Totales</th></tr>
+                </thead>
+                <tbody id="conteoTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Condiciones del nido</h3>
+            <div class="cond-grid">
+              <div class="cond-item">
+                <div class="cond-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="8" cy="12" r="2"/><circle cx="14" cy="9" r="1.6"/><circle cx="17" cy="14" r="1.4"/><path d="M8 12L2 9M8 12l-4 6M8 12l6-3M14 9l4-3M14 9l3 4M17 14l4 2"/></svg>Hormigas</div>
+                <div class="chip-toggle" data-field="l_hormigas"><button type="button" data-val="S">Sí</button><button type="button" data-val="N">No</button></div>
+              </div>
+              <div class="cond-item">
+                <div class="cond-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v8M12 11c-2 1-3 3-3 6M12 11c2 1 3 3 3 6M12 11c-4 0-6-2-7-5M12 11c4 0 6-2 7-5"/></svg>Raíces</div>
+                <div class="chip-toggle" data-field="l_raices"><button type="button" data-val="S">Sí</button><button type="button" data-val="N">No</button></div>
+              </div>
+              <div class="cond-item">
+                <div class="cond-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 16c2-6 4-9 8-9s6 3 8 9"/><circle cx="4" cy="17" r="1.2"/><circle cx="20" cy="17" r="1.2"/></svg>Larvas</div>
+                <div class="chip-toggle" data-field="l_larvas"><button type="button" data-val="S">Sí</button><button type="button" data-val="N">No</button></div>
+              </div>
+              <div class="cond-item">
+                <div class="cond-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 17l3-8 5-3 5 3 3 8-8 3-8-3z"/></svg>Piedras</div>
+                <div class="chip-toggle" data-field="l_piedras"><button type="button" data-val="S">Sí</button><button type="button" data-val="N">No</button></div>
+              </div>
+              <div class="cond-item">
+                <div class="cond-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="9" cy="8" rx="2.4" ry="3.2"/><ellipse cx="15" cy="16" rx="2.4" ry="3.2"/></svg>Huellas</div>
+                <div class="chip-toggle" data-field="l_huellas"><button type="button" data-val="S">Sí</button><button type="button" data-val="N">No</button></div>
+              </div>
+              <div class="cond-item">
+                <div class="cond-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>Otros</div>
+                <div class="chip-toggle" data-field="l_otros"><button type="button" data-val="S">Sí</button><button type="button" data-val="N">No</button></div>
+              </div>
+            </div>
+            <input type="hidden" id="l_hormigas"><input type="hidden" id="l_raices"><input type="hidden" id="l_larvas">
+            <input type="hidden" id="l_piedras"><input type="hidden" id="l_huellas"><input type="hidden" id="l_otros">
+            <br>
+            <div class="field">
+              <label>Detalle / observaciones</label>
+              <textarea id="l_otros_detalle" placeholder="Notas de campo…"></textarea>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn ghost" id="resetLimpiezaBtn">Limpiar</button>
+            <button type="submit" class="btn">Guardar limpieza</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- --- Subvista: listado --- -->
+      <div id="sub-limpieza-lista" style="display:none;">
+        <div class="toolbar">
+          <input type="text" id="limpiezaSearchInput" placeholder="Buscar por No. de ficha, corral, nido…">
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr><th>No. Ficha</th><th>Fecha limpieza</th><th>Corral</th><th>Nido</th><th>Crías vivas</th><th>Huevos totales</th><th>Éxito</th><th></th></tr>
+            </thead>
+            <tbody id="limpiezaTableBody"></tbody>
+          </table>
+        </div>
+        <div class="empty-state" id="limpiezaEmptyState" style="display:none;">
+          <div class="em-mark">🥚</div>
+          No hay registros de limpieza que coincidan con la búsqueda.
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== MAPA DE NIDOS ===================== -->
+    <section id="view-mapa" style="display:none;">
+      <div class="topline">
+        <h1>Mapa de nidos</h1>
+        <div class="folio-badge" id="mapaBadge">—</div>
+      </div>
+
+      <div class="map-legend">
+        <span><span class="dot" style="background:#8A93A0;"></span>Sin limpieza registrada</span>
+        <span><span class="dot" style="background:#C08A32;"></span>Limpiado · éxito bajo (&lt;50%)</span>
+        <span><span class="dot" style="background:#3E7D5A;"></span>Limpiado · éxito alto (≥50%)</span>
+        <span><span class="dot" style="background:#AE4A30;"></span>Sin coordenadas</span>
+      </div>
+
+      <div class="map-columns">
+        <div id="nestMap"></div>
+        <div class="map-side-list" id="mapSideList"></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="overlay" id="detailOverlay">
+  <div class="drawer" id="drawerContent"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   Catálogos (según leyenda impresa en la ficha física)
+   ============================================================ */
+const ACCIONES = {
+  "0":"Apareando", "1":"Sube", "2":"Hace nido", "3":"Pone", "4":"Tapa", "5":"Baja",
+  "6":"No puso (arqueo)", "7":"Nadando (de regreso)", "8":"Sólo nido (sin tortuga)",
+  "9":"Varada viva", "10":"Varada muerta"
+};
+const USOS_NIDO = {
+  "1":"Corral", "3":"Caja", "5":"Saqueado", "6":"Depredado", "7":"No localizado",
+  "8":"No puso", "9":"In situ", "11":"Reubicado", "12":"Sólo rastro (arqueo)"
+};
+
+/* Categorías de la Ficha de Limpieza de Nido — mismo orden que el formato físico */
+const CATEGORIAS_CONTEO = [
+  {key:'superficie_vivas',    label:'En superficie · Crías vivas',   simple:false, countsHatchlings:true},
+  {key:'superficie_muertas',  label:'En superficie · Crías muertas', simple:false, countsHatchlings:false},
+  {key:'nido_vivas',          label:'Dentro del nido · Crías vivas', simple:false, countsHatchlings:true},
+  {key:'nido_muertas',        label:'Dentro del nido · Crías muertas', simple:false, countsHatchlings:false},
+  {key:'cascarones',          label:'Cascarones',                    simple:true,  countsHatchlings:false, excludeFromEggs:true},
+  {key:'eclosionando_vivas',  label:'Crías eclosionando · Vivas',    simple:false, countsHatchlings:true},
+  {key:'eclosionando_muertas',label:'Crías eclosionando · Muertas',  simple:false, countsHatchlings:false},
+  {key:'no_ecl_fase1',        label:'Huevos no eclosionados · 1a. fase', simple:false, countsHatchlings:false},
+  {key:'no_ecl_fase2',        label:'Huevos no eclosionados · 2a. fase', simple:false, countsHatchlings:false},
+  {key:'no_ecl_fase3_vivas',  label:'Huevos no eclosionados · 3a. vivas', simple:false, countsHatchlings:false},
+  {key:'no_ecl_fase3_muertas',label:'Huevos no eclosionados · 3a. muertas', simple:false, countsHatchlings:false},
+  {key:'sin_desarrollo',      label:'Sin desarrollo embrionario aparente (rosas, huevos)', simple:false, countsHatchlings:false}
+];
+
+let fichas = [];
+let limpiezas = [];
+let editingId = null;
+let editingLimpiezaId = null;
+
+/* ============================================================
+   Storage helpers (base de datos del proyecto — compartida)
+   ============================================================ */
+async function loadFichas(){
+  try{
+    const res = await window.storage.get('fichas_index', true);
+    fichas = res ? JSON.parse(res.value) : [];
+  }catch(e){
+    fichas = [];
+  }
+  if(fichas.length === 0){
+    fichas = [seedRecord()];
+    await persist();
+  }
+}
+async function persist(){
+  try{
+    await window.storage.set('fichas_index', JSON.stringify(fichas), true);
+  }catch(e){
+    showToast('No se pudo guardar en la base de datos compartida.');
+  }
+}
+function seedRecord(){
+  return {
+    id: 'seed-15681',
+    numero: '15681', playa: 'MIR', estaca: '19.3', zona: '',
+    fecha: '2026-06-16', especie: 'CM', sexo: '',
+    formulo: 'JA', accion: '8', uso_nido: '1', corral: '1', numero_nido: '3',
+    hora_a: '', hora_b: '17:35', hora_c: '13:18',
+    huevos_colectados: 103, huevos_rotos: null, posicion: '',
+    lat: 22.2553, lng: -97.8611,
+    izq: {pit:'', marca:'', leyenda:'', cicatriz:'no'},
+    der: {pit:'', marca:'', leyenda:'', cicatriz:'no'},
+    bio: {mp:null, pm:null, mm:null, ancho:null}, tumores:false,
+    observaciones: 'Ficha original escaneada del formato físico No. 15681.',
+    createdAt: Date.now()
+  };
+}
+
+async function loadLimpiezas(){
+  try{
+    const res = await window.storage.get('limpiezas_index', true);
+    limpiezas = res ? JSON.parse(res.value) : [];
+  }catch(e){
+    limpiezas = [];
+  }
+  if(limpiezas.length === 0){
+    limpiezas = [seedLimpiezaRecord()];
+    await persistLimpiezas();
+  }
+}
+async function persistLimpiezas(){
+  try{
+    await window.storage.set('limpiezas_index', JSON.stringify(limpiezas), true);
+  }catch(e){
+    showToast('No se pudo guardar en la base de datos compartida.');
+  }
+}
+function blankConteos(){
+  const c = {};
+  CATEGORIAS_CONTEO.forEach(cat => c[cat.key] = {normales:null, albina:null, deforme:null, albinas_deformes:null, total:null});
+  return c;
+}
+function seedLimpiezaRecord(){
+  const c = blankConteos();
+  c.superficie_vivas   = {normales:16, albina:null, deforme:null, albinas_deformes:null, total:16}; // "13+3" en la ficha física
+  c.cascarones         = {normales:null, albina:null, deforme:null, albinas_deformes:null, total:17};
+  c.no_ecl_fase1        = {normales:22, albina:null, deforme:null, albinas_deformes:null, total:22};
+  c.no_ecl_fase3_vivas  = {normales:1, albina:null, deforme:null, albinas_deformes:null, total:1};
+  c.sin_desarrollo      = {normales:48, albina:null, deforme:null, albinas_deformes:null, total:48};
+  return {
+    id: 'seed-10933',
+    numero: '10933', playa: 'MIR', corral: '1', nido: '3',
+    fecha_emergencia: '2026-08-09', fecha_limpieza: '2026-08-17',
+    especie: 'LO', formulo: 'JA', uso_nido: '',
+    lat: null, lng: null,
+    conteos: c,
+    hormigas:'', raices:'', larvas:'', piedras:'', huellas:'',
+    otros:'', otros_detalle: 'Ficha original escaneada del formato físico No. 10933. Notas manuscritas adicionales parcialmente ilegibles; verificar en campo.',
+    createdAt: Date.now()
+  };
+}
+
+/* ============================================================
+   Navigation
+   ============================================================ */
+const views = ['panel','nueva','fichas','limpieza','mapa'];
+function showView(name){
+  views.forEach(v => document.getElementById('view-'+v).style.display = (v===name?'':'none'));
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.dataset.view===name));
+  if(name==='panel') renderPanel();
+  if(name==='fichas') renderTable();
+  if(name==='nueva' && editingId===null) resetForm();
+  if(name==='limpieza'){ showLimpiezaSub('nueva'); renderLimpiezaTable(); }
+  if(name==='mapa') renderMap();
+}
+function showLimpiezaSub(sub){
+  document.getElementById('sub-limpieza-nueva').style.display = sub==='nueva' ? '' : 'none';
+  document.getElementById('sub-limpieza-lista').style.display = sub==='lista' ? '' : 'none';
+  document.getElementById('tabLimpiezaNueva').classList.toggle('ghost', sub!=='nueva');
+  document.getElementById('tabLimpiezaLista').classList.toggle('ghost', sub!=='lista');
+  if(sub==='lista') renderLimpiezaTable();
+  if(sub==='nueva' && editingLimpiezaId===null) resetLimpiezaForm();
+}
+document.getElementById('tabLimpiezaNueva').addEventListener('click', ()=> showLimpiezaSub('nueva'));
+document.getElementById('tabLimpiezaLista').addEventListener('click', ()=> showLimpiezaSub('lista'));
+document.getElementById('primaryNav').addEventListener('click', e=>{
+  const item = e.target.closest('.nav-item');
+  if(item) showView(item.dataset.view);
+});
+document.getElementById('goNewBtn').addEventListener('click', ()=>{ editingId=null; resetForm(); showView('nueva'); });
+
+/* ============================================================
+   Populate selects
+   ============================================================ */
+function fillSelect(id, map){
+  const sel = document.getElementById(id);
+  Object.entries(map).forEach(([code,label])=>{
+    const opt = document.createElement('option');
+    opt.value = code; opt.textContent = code+' — '+label;
+    sel.appendChild(opt);
+  });
+}
+fillSelect('f_accion', ACCIONES);
+fillSelect('f_uso_nido', USOS_NIDO);
+fillSelect('l_uso_nido', USOS_NIDO);
+
+/* ============================================================
+   Tabla de conteo dinámica (Ficha de limpieza de nido)
+   ============================================================ */
+function buildConteoTable(){
+  const tbody = document.getElementById('conteoTableBody');
+  tbody.innerHTML = '';
+  CATEGORIAS_CONTEO.forEach(cat=>{
+    const tr = document.createElement('tr');
+    if(cat.simple){
+      tr.innerHTML = `
+        <td>${cat.label}</td>
+        <td colspan="4" style="color:var(--ink-soft); font-size:12.5px;">Sólo total</td>
+        <td><input type="number" min="0" style="width:70px;" data-cat="${cat.key}" data-field="total"></td>`;
+    } else {
+      tr.innerHTML = `
+        <td>${cat.label}</td>
+        <td><input type="number" min="0" style="width:70px;" data-cat="${cat.key}" data-field="normales"></td>
+        <td><input type="number" min="0" style="width:70px;" data-cat="${cat.key}" data-field="albina"></td>
+        <td><input type="number" min="0" style="width:70px;" data-cat="${cat.key}" data-field="deforme"></td>
+        <td><input type="number" min="0" style="width:70px;" data-cat="${cat.key}" data-field="albinas_deformes"></td>
+        <td><input type="number" min="0" style="width:70px;" data-cat="${cat.key}" data-field="total" placeholder="auto"></td>`;
+    }
+    tbody.appendChild(tr);
+  });
+}
+buildConteoTable();
+
+/* ============================================================
+   Selector visual de posición
+   ============================================================ */
+document.getElementById('posPicker').addEventListener('click', e=>{
+  const card = e.target.closest('.pos-card');
+  if(!card) return;
+  document.querySelectorAll('#posPicker .pos-card').forEach(c=>c.classList.remove('active'));
+  card.classList.add('active');
+  document.getElementById('f_posicion').value = card.dataset.pos;
+});
+function setPosPicker(val){
+  document.querySelectorAll('#posPicker .pos-card').forEach(c=>c.classList.toggle('active', c.dataset.pos===val));
+  document.getElementById('f_posicion').value = val||'';
+}
+
+/* ============================================================
+   Chips de condiciones del nido (Sí / No)
+   ============================================================ */
+document.querySelectorAll('.chip-toggle').forEach(group=>{
+  group.addEventListener('click', e=>{
+    const btn = e.target.closest('button');
+    if(!btn) return;
+    const hidden = document.getElementById(group.dataset.field);
+    const newVal = hidden.value===btn.dataset.val ? '' : btn.dataset.val;
+    hidden.value = newVal;
+    syncChipGroup(group, newVal);
+  });
+});
+function syncChipGroup(group, val){
+  group.querySelectorAll('button').forEach(b=>{
+    b.classList.remove('active-si','active-no');
+    if(b.dataset.val===val) b.classList.add(val==='S' ? 'active-si' : 'active-no');
+  });
+}
+function syncAllChips(){
+  document.querySelectorAll('.chip-toggle').forEach(group=>{
+    const hidden = document.getElementById(group.dataset.field);
+    syncChipGroup(group, hidden.value);
+  });
+}
+
+/* ============================================================
+   Geolocalización
+   ============================================================ */
+function wireLocateButton(btnId, latId, lngId, statusId, onSuccess){
+  const btn = document.getElementById(btnId);
+  if(!btn) return;
+  btn.addEventListener('click', ()=>{
+    if(!navigator.geolocation){
+      if(statusId) document.getElementById(statusId).textContent = 'Este dispositivo no permite obtener ubicación automática.';
+      return;
+    }
+    btn.disabled = true;
+    const original = btn.innerHTML;
+    btn.innerHTML = 'Localizando…';
+    navigator.geolocation.getCurrentPosition(pos=>{
+      document.getElementById(latId).value = pos.coords.latitude.toFixed(6);
+      document.getElementById(lngId).value = pos.coords.longitude.toFixed(6);
+      if(statusId) document.getElementById(statusId).textContent = 'Ubicación capturada (±' + Math.round(pos.coords.accuracy) + ' m de precisión).';
+      btn.disabled = false; btn.innerHTML = original;
+      if(onSuccess) onSuccess(pos);
+    }, err=>{
+      if(statusId) document.getElementById(statusId).textContent = 'No se pudo obtener la ubicación: ' + err.message;
+      btn.disabled = false; btn.innerHTML = original;
+    }, {enableHighAccuracy:true, timeout:10000});
+  });
+}
+wireLocateButton('f_locateBtn','f_lat','f_lng','f_geoStatus', ()=>{
+  showMiniMap(Number(document.getElementById('f_lat').value), Number(document.getElementById('f_lng').value));
+});
+wireLocateButton('l_locateBtn','l_lat','l_lng');
+
+/* ============================================================
+   Mini-mapa de confirmación en el formulario de ficha
+   ============================================================ */
+let miniMap = null, miniMarker = null;
+function showMiniMap(lat, lng){
+  const el = document.getElementById('f_miniMap');
+  if(isNaN(lat) || isNaN(lng) || lat===null || lng===null){ el.style.display='none'; return; }
+  el.style.display = 'block';
+  if(!miniMap){
+    miniMap = L.map('f_miniMap', {zoomControl:false, attributionControl:false}).setView([lat,lng], 15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19}).addTo(miniMap);
+    miniMarker = L.marker([lat,lng]).addTo(miniMap);
+  } else {
+    miniMap.setView([lat,lng], 15);
+    miniMarker.setLatLng([lat,lng]);
+  }
+  setTimeout(()=> miniMap && miniMap.invalidateSize(), 60);
+}
+['f_lat','f_lng'].forEach(id=>{
+  document.getElementById(id).addEventListener('change', ()=>{
+    const lat = parseFloat(document.getElementById('f_lat').value);
+    const lng = parseFloat(document.getElementById('f_lng').value);
+    showMiniMap(lat, lng);
+  });
+});
+
+/* ============================================================
+   Mapa de nidos (Leaflet) — ubicación y estatus de limpieza
+   ============================================================ */
+let leafletMap = null, mapMarkersLayer = null;
+function findLimpiezaForFicha(f){
+  const c = (f.corral||'').trim().toUpperCase();
+  const n = (f.numero_nido||'').trim().toUpperCase();
+  if(!c || !n) return null;
+  return limpiezas.find(l => (l.corral||'').trim().toUpperCase()===c && (l.nido||'').trim().toUpperCase()===n) || null;
+}
+function renderMap(){
+  document.getElementById('mapaBadge').textContent = fichas.length + ' nido(s) registrado(s)';
+  if(!leafletMap){
+    leafletMap = L.map('nestMap');
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap', maxZoom: 19
+    }).addTo(leafletMap);
+    mapMarkersLayer = L.layerGroup().addTo(leafletMap);
+  }
+  mapMarkersLayer.clearLayers();
+
+  const sideList = document.getElementById('mapSideList');
+  sideList.innerHTML = '';
+  const withCoords = [];
+
+  fichas.forEach(f=>{
+    const limp = findLimpiezaForFicha(f);
+    let status, color;
+    const hasCoords = f.lat!==null && f.lat!==undefined && f.lng!==null && f.lng!==undefined && f.lat!=='' && f.lng!=='';
+    let pct = null;
+    if(!hasCoords){ status='Sin coordenadas'; color='#AE4A30'; }
+    else if(!limp){ status='Sin limpieza registrada'; color='#8A93A0'; }
+    else {
+      pct = hatchSuccess(limp).pct;
+      if(pct===null){ status='Limpiado · sin datos de conteo'; color='#8A93A0'; }
+      else if(pct>=50){ status='Limpiado · éxito alto'; color='#3E7D5A'; }
+      else { status='Limpiado · éxito bajo'; color='#C08A32'; }
+    }
+
+    if(hasCoords){
+      withCoords.push(f);
+      const marker = L.circleMarker([f.lat, f.lng], {radius:8, color:'#fff', weight:2, fillColor:color, fillOpacity:0.95}).addTo(mapMarkersLayer);
+      marker.bindPopup(`
+        <b>No. ${escapeHtml(f.numero||'—')}</b><br>
+        <div class="popup-row"><span class="k">Playa</span><span>${escapeHtml((f.playa||'—').toUpperCase())}</span></div>
+        <div class="popup-row"><span class="k">Corral / Nido</span><span>${escapeHtml(f.corral||'—')} / ${escapeHtml(f.numero_nido||'—')}</span></div>
+        <div class="popup-row"><span class="k">Fecha de puesta</span><span>${formatDate(f.fecha)}</span></div>
+        <div class="popup-row"><span class="k">Huevos</span><span>${f.huevos_colectados ?? '—'}</span></div>
+        <div class="popup-row"><span class="k">Estatus</span><span>${status}</span></div>
+        ${pct!==null ? `<div class="popup-row"><span class="k">Éxito eclosión</span><span>${pct.toFixed(1)}%</span></div>` : ''}
+      `);
+    }
+
+    sideList.insertAdjacentHTML('beforeend', `
+      <div class="map-side-item" data-lat="${hasCoords?f.lat:''}" data-lng="${hasCoords?f.lng:''}">
+        <div class="title"><span>No. ${escapeHtml(f.numero||'—')}</span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${color};flex-shrink:0;"></span></div>
+        <div class="sub">${escapeHtml((f.playa||'—').toUpperCase())} · Corral ${escapeHtml(f.corral||'—')} / Nido ${escapeHtml(f.numero_nido||'—')} — ${status}</div>
+      </div>`);
+  });
+
+  if(withCoords.length){
+    leafletMap.fitBounds(L.latLngBounds(withCoords.map(f=>[f.lat,f.lng])), {padding:[30,30], maxZoom:15});
+  } else {
+    leafletMap.setView([22.27, -97.86], 9);
+  }
+  setTimeout(()=> leafletMap.invalidateSize(), 60);
+
+  if(fichas.length===0){
+    sideList.innerHTML = '<div class="hint" style="padding:16px;">Aún no hay nidos registrados.</div>';
+  }
+}
+document.getElementById('mapSideList').addEventListener('click', e=>{
+  const item = e.target.closest('.map-side-item');
+  if(!item || !item.dataset.lat || !item.dataset.lng) return;
+  leafletMap.setView([Number(item.dataset.lat), Number(item.dataset.lng)], 16);
+});
+
+/* ============================================================
+   Panel / dashboard
+   ============================================================ */
+function renderPanel(){
+  const totalFichas = fichas.length;
+  const totalHuevos = fichas.reduce((s,f)=> s + (Number(f.huevos_colectados)||0), 0);
+  const totalNidosCorral = fichas.filter(f=> f.uso_nido === '1').length;
+  const promedio = totalFichas ? Math.round(totalHuevos/totalFichas) : 0;
+
+  document.getElementById('statFichas').textContent = totalFichas;
+  document.getElementById('statHuevos').textContent = totalHuevos.toLocaleString('es-MX');
+  document.getElementById('statNidos').textContent = totalNidosCorral;
+  document.getElementById('statPromedio').textContent = promedio;
+  document.getElementById('lastSync').textContent = 'Base de datos compartida · ' + (totalFichas+limpiezas.length) + ' registro(s)';
+
+  document.getElementById('statLimpiezas').textContent = limpiezas.length;
+  const successes = limpiezas.map(hatchSuccess).filter(s=> s.pct!==null);
+  const totalCriasVivas = limpiezas.reduce((s,l)=> s + hatchSuccess(l).vivas, 0);
+  const promedioExito = successes.length ? (successes.reduce((s,x)=> s+x.pct, 0)/successes.length) : null;
+  document.getElementById('statCrias').textContent = totalCriasVivas;
+  document.getElementById('statExito').textContent = promedioExito!==null ? promedioExito.toFixed(1)+'%' : '—';
+
+  const byPlaya = {};
+  fichas.forEach(f=>{
+    const key = (f.playa||'Sin playa').toUpperCase();
+    byPlaya[key] = (byPlaya[key]||0) + (Number(f.huevos_colectados)||0);
+  });
+  const maxVal = Math.max(1, ...Object.values(byPlaya));
+  const barsEl = document.getElementById('barsByPlaya');
+  barsEl.innerHTML = '';
+  Object.entries(byPlaya).sort((a,b)=>b[1]-a[1]).forEach(([playa,val])=>{
+    barsEl.insertAdjacentHTML('beforeend', `
+      <div class="bar-row">
+        <div class="bar-label">${playa}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${(val/maxVal*100).toFixed(0)}%"></div></div>
+        <div class="bar-val">${val}</div>
+      </div>`);
+  });
+  if(Object.keys(byPlaya).length===0){ barsEl.innerHTML = '<div class="hint">Aún no hay datos.</div>'; }
+
+  const recentEl = document.getElementById('recentList');
+  recentEl.innerHTML = '';
+  [...fichas].sort((a,b)=> (b.createdAt||0)-(a.createdAt||0)).slice(0,6).forEach(f=>{
+    recentEl.insertAdjacentHTML('beforeend', `
+      <div class="recent-item">
+        <span>No. ${escapeHtml(f.numero||'—')} · ${escapeHtml((f.playa||'—').toUpperCase())}</span>
+        <span class="meta">${formatDate(f.fecha)} · ${f.huevos_colectados||0} huevos</span>
+      </div>`);
+  });
+  if(fichas.length===0){ recentEl.innerHTML = '<div class="hint">Sin registros todavía.</div>'; }
+}
+
+/* ============================================================
+   Table view
+   ============================================================ */
+function populateFilters(){
+  const playaSel = document.getElementById('filterPlaya');
+  const accionSel = document.getElementById('filterAccion');
+  const playasActuales = [...new Set(fichas.map(f=> (f.playa||'').toUpperCase()).filter(Boolean))].sort();
+  playaSel.innerHTML = '<option value="">Todas las playas</option>' + playasActuales.map(p=>`<option value="${p}">${p}</option>`).join('');
+  accionSel.innerHTML = '<option value="">Todas las acciones</option>' + Object.entries(ACCIONES).map(([c,l])=>`<option value="${c}">${c} — ${l}</option>`).join('');
+}
+function renderTable(){
+  populateFilters();
+  const q = (document.getElementById('searchInput').value||'').toLowerCase();
+  const fPlaya = document.getElementById('filterPlaya').value;
+  const fAccion = document.getElementById('filterAccion').value;
+
+  const rows = fichas.filter(f=>{
+    const matchesQ = !q || [f.numero,f.playa,f.izq?.pit,f.der?.pit,f.izq?.marca,f.der?.marca]
+      .some(v => (v||'').toString().toLowerCase().includes(q));
+    const matchesPlaya = !fPlaya || (f.playa||'').toUpperCase()===fPlaya;
+    const matchesAccion = !fAccion || f.accion===fAccion;
+    return matchesQ && matchesPlaya && matchesAccion;
+  }).sort((a,b)=> (b.createdAt||0)-(a.createdAt||0));
+
+  const tbody = document.getElementById('fichasTableBody');
+  tbody.innerHTML = '';
+  document.getElementById('emptyState').style.display = rows.length ? 'none' : '';
+
+  rows.forEach(f=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${escapeHtml(f.numero||'—')}</td>
+      <td>${formatDate(f.fecha)}</td>
+      <td>${escapeHtml((f.playa||'—').toUpperCase())}</td>
+      <td>${escapeHtml(f.estaca||'—')}</td>
+      <td>${escapeHtml(f.especie||'—')}</td>
+      <td><span class="pill">${f.accion ? f.accion+' · '+ACCIONES[f.accion] : '—'}</span></td>
+      <td>${f.huevos_colectados ?? '—'}</td>
+      <td>${escapeHtml(f.corral||'—')}</td>
+      <td>
+        <div class="row-actions">
+          <button class="icon-btn" title="Ver" data-act="view" data-id="${f.id}">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+          <button class="icon-btn" title="Editar" data-act="edit" data-id="${f.id}">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          </button>
+          <button class="icon-btn" title="Eliminar" data-act="del" data-id="${f.id}">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+          </button>
+        </div>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+document.getElementById('searchInput').addEventListener('input', renderTable);
+document.getElementById('filterPlaya').addEventListener('change', renderTable);
+document.getElementById('filterAccion').addEventListener('change', renderTable);
+
+document.getElementById('fichasTableBody').addEventListener('click', e=>{
+  const btn = e.target.closest('button');
+  if(!btn) return;
+  const id = btn.dataset.id;
+  const f = fichas.find(x=>x.id===id);
+  if(!f) return;
+  if(btn.dataset.act==='view') openDetail(f);
+  if(btn.dataset.act==='edit'){ editingId=id; fillForm(f); showView('nueva'); }
+  if(btn.dataset.act==='del'){ deleteFicha(id); }
+});
+
+async function deleteFicha(id){
+  if(!confirm('¿Eliminar esta ficha de la base de datos? Esta acción no se puede deshacer.')) return;
+  fichas = fichas.filter(f=>f.id!==id);
+  await persist();
+  renderTable(); renderPanel();
+  showToast('Ficha eliminada.');
+}
+
+/* ============================================================
+   Detail drawer
+   ============================================================ */
+function openDetail(f){
+  const el = document.getElementById('drawerContent');
+  el.innerHTML = `
+    <div class="drawer-head">
+      <h2>Ficha No. ${escapeHtml(f.numero||'—')}</h2>
+      <button class="close-x" id="closeDrawer">&times;</button>
+    </div>
+    <div class="hint">${formatDate(f.fecha)} · ${escapeHtml((f.playa||'—').toUpperCase())}</div>
+
+    <div class="detail-block">
+      <h4>Datos generales</h4>
+      <div class="kv-grid">
+        <div class="kv"><div class="k">Estaca</div><div class="v">${escapeHtml(f.estaca||'—')}</div></div>
+        <div class="kv"><div class="k">Zona</div><div class="v">${escapeHtml(f.zona||'—')}</div></div>
+        <div class="kv"><div class="k">Especie</div><div class="v">${escapeHtml(f.especie||'—')}</div></div>
+        <div class="kv"><div class="k">Sexo</div><div class="v">${escapeHtml(f.sexo||'—')}</div></div>
+        <div class="kv"><div class="k">Formuló</div><div class="v">${escapeHtml(f.formulo||'—')}</div></div>
+      </div>
+    </div>
+
+    <div class="detail-block">
+      <h4>Acción y nido</h4>
+      <div class="kv-grid">
+        <div class="kv"><div class="k">Acción</div><div class="v">${f.accion?f.accion+' — '+ACCIONES[f.accion]:'—'}</div></div>
+        <div class="kv"><div class="k">Uso de nido</div><div class="v">${f.uso_nido?f.uso_nido+' — '+USOS_NIDO[f.uso_nido]:'—'}</div></div>
+        <div class="kv"><div class="k">Corral</div><div class="v">${escapeHtml(f.corral||'—')}</div></div>
+        <div class="kv"><div class="k">Núm. nido</div><div class="v">${escapeHtml(f.numero_nido||'—')}</div></div>
+        <div class="kv"><div class="k">Hora A</div><div class="v">${f.hora_a||'—'}</div></div>
+        <div class="kv"><div class="k">Hora B (colecta)</div><div class="v">${f.hora_b||'—'}</div></div>
+        <div class="kv"><div class="k">Hora C (siembra)</div><div class="v">${f.hora_c||'—'}</div></div>
+        <div class="kv"><div class="k">Huevos colectados</div><div class="v">${f.huevos_colectados ?? '—'}</div></div>
+        <div class="kv"><div class="k">Huevos rotos</div><div class="v">${f.huevos_rotos ?? '—'}</div></div>
+        <div class="kv"><div class="k">Posición</div><div class="v">${f.posicion||'—'}</div></div>
+      </div>
+    </div>
+
+    <div class="detail-block">
+      <h4>Marcado</h4>
+      <div class="kv-grid">
+        <div class="kv"><div class="k">PIT izquierda</div><div class="v">${escapeHtml(f.izq?.pit||'—')}</div></div>
+        <div class="kv"><div class="k">PIT derecha</div><div class="v">${escapeHtml(f.der?.pit||'—')}</div></div>
+        <div class="kv"><div class="k">Marca izquierda</div><div class="v">${escapeHtml(f.izq?.marca||'—')}</div></div>
+        <div class="kv"><div class="k">Marca derecha</div><div class="v">${escapeHtml(f.der?.marca||'—')}</div></div>
+      </div>
+    </div>
+
+    <div class="detail-block">
+      <h4>Biometrías del caparazón</h4>
+      <div class="kv-grid">
+        <div class="kv"><div class="k">Muesca–punta más larga</div><div class="v">${f.bio?.mp ?? '—'} cm</div></div>
+        <div class="kv"><div class="k">Punta–muesca</div><div class="v">${f.bio?.pm ?? '—'} cm</div></div>
+        <div class="kv"><div class="k">Muesca–muesca</div><div class="v">${f.bio?.mm ?? '—'} cm</div></div>
+        <div class="kv"><div class="k">Ancho</div><div class="v">${f.bio?.ancho ?? '—'} cm</div></div>
+        <div class="kv"><div class="k">Tumores</div><div class="v">${f.tumores? 'Presentes' : 'No observados'}</div></div>
+      </div>
+    </div>
+
+    <div class="detail-block">
+      <h4>Observaciones</h4>
+      <div style="font-size:13.5px; line-height:1.5;">${escapeHtml(f.observaciones||'Sin observaciones.')}</div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn ghost small" id="drawerEdit">Editar ficha</button>
+    </div>
+  `;
+  document.getElementById('detailOverlay').classList.add('open');
+  document.getElementById('closeDrawer').onclick = closeDetail;
+  document.getElementById('drawerEdit').onclick = ()=>{ closeDetail(); editingId=f.id; fillForm(f); showView('nueva'); };
+}
+function closeDetail(){ document.getElementById('detailOverlay').classList.remove('open'); }
+document.getElementById('detailOverlay').addEventListener('click', e=>{ if(e.target.id==='detailOverlay') closeDetail(); });
+
+/* ============================================================
+   Form: create / edit
+   ============================================================ */
+function resetForm(){
+  document.getElementById('fichaForm').reset();
+  document.getElementById('f_id').value = '';
+  document.getElementById('formTitle').textContent = 'Nueva ficha de anidación';
+  document.getElementById('cancelEditBtn').style.display = 'none';
+  setPosPicker('');
+  document.getElementById('f_geoStatus').textContent = 'Toca el botón parado junto al nido, o captura las coordenadas con un GPS de mano.';
+  editingId = null;
+}
+function fillForm(f){
+  document.getElementById('formTitle').textContent = 'Editar ficha No. '+ (f.numero||'');
+  document.getElementById('cancelEditBtn').style.display = '';
+  document.getElementById('f_id').value = f.id;
+  document.getElementById('f_numero').value = f.numero||'';
+  document.getElementById('f_playa').value = f.playa||'';
+  document.getElementById('f_estaca').value = f.estaca||'';
+  document.getElementById('f_zona').value = f.zona||'';
+  document.getElementById('f_fecha').value = f.fecha||'';
+  document.getElementById('f_especie').value = f.especie||'';
+  document.getElementById('f_sexo').value = f.sexo||'';
+  document.getElementById('f_formulo').value = f.formulo||'';
+  document.getElementById('f_accion').value = f.accion||'';
+  document.getElementById('f_uso_nido').value = f.uso_nido||'';
+  document.getElementById('f_corral').value = f.corral||'';
+  document.getElementById('f_numero_nido').value = f.numero_nido||'';
+  document.getElementById('f_hora_a').value = f.hora_a||'';
+  document.getElementById('f_hora_b').value = f.hora_b||'';
+  document.getElementById('f_hora_c').value = f.hora_c||'';
+  document.getElementById('f_huevos_colectados').value = f.huevos_colectados ?? '';
+  document.getElementById('f_huevos_rotos').value = f.huevos_rotos ?? '';
+  setPosPicker(f.posicion||'');
+  document.getElementById('f_lat').value = f.lat ?? '';
+  document.getElementById('f_lng').value = f.lng ?? '';
+  showMiniMap(f.lat, f.lng);
+  document.getElementById('f_izq_pit').value = f.izq?.pit||'';
+  document.getElementById('f_izq_marca').value = f.izq?.marca||'';
+  document.getElementById('f_izq_leyenda').value = f.izq?.leyenda||'';
+  document.getElementById('f_der_pit').value = f.der?.pit||'';
+  document.getElementById('f_der_marca').value = f.der?.marca||'';
+  document.getElementById('f_der_leyenda').value = f.der?.leyenda||'';
+  document.querySelector(`input[name="izq_cicatriz"][value="${f.izq?.cicatriz||'no'}"]`).checked = true;
+  document.querySelector(`input[name="der_cicatriz"][value="${f.der?.cicatriz||'no'}"]`).checked = true;
+  document.getElementById('f_bio_mp').value = f.bio?.mp ?? '';
+  document.getElementById('f_bio_pm').value = f.bio?.pm ?? '';
+  document.getElementById('f_bio_mm').value = f.bio?.mm ?? '';
+  document.getElementById('f_bio_ancho').value = f.bio?.ancho ?? '';
+  document.getElementById('f_tumores').checked = !!f.tumores;
+  document.getElementById('f_observaciones').value = f.observaciones||'';
+}
+document.getElementById('cancelEditBtn').addEventListener('click', ()=>{ resetForm(); });
+document.getElementById('resetFormBtn').addEventListener('click', ()=>{ resetForm(); });
+
+document.getElementById('fichaForm').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const id = document.getElementById('f_id').value || ('f-'+Date.now());
+  const record = {
+    id,
+    numero: document.getElementById('f_numero').value.trim(),
+    playa: document.getElementById('f_playa').value.trim(),
+    estaca: document.getElementById('f_estaca').value.trim(),
+    zona: document.getElementById('f_zona').value.trim(),
+    fecha: document.getElementById('f_fecha').value,
+    especie: document.getElementById('f_especie').value.trim(),
+    sexo: document.getElementById('f_sexo').value,
+    formulo: document.getElementById('f_formulo').value.trim(),
+    accion: document.getElementById('f_accion').value,
+    uso_nido: document.getElementById('f_uso_nido').value,
+    corral: document.getElementById('f_corral').value.trim(),
+    numero_nido: document.getElementById('f_numero_nido').value.trim(),
+    hora_a: document.getElementById('f_hora_a').value,
+    hora_b: document.getElementById('f_hora_b').value,
+    hora_c: document.getElementById('f_hora_c').value,
+    huevos_colectados: document.getElementById('f_huevos_colectados').value ? Number(document.getElementById('f_huevos_colectados').value) : null,
+    huevos_rotos: document.getElementById('f_huevos_rotos').value ? Number(document.getElementById('f_huevos_rotos').value) : null,
+    posicion: document.getElementById('f_posicion').value,
+    lat: document.getElementById('f_lat').value ? Number(document.getElementById('f_lat').value) : null,
+    lng: document.getElementById('f_lng').value ? Number(document.getElementById('f_lng').value) : null,
+    izq: {
+      pit: document.getElementById('f_izq_pit').value.trim(),
+      marca: document.getElementById('f_izq_marca').value.trim(),
+      leyenda: document.getElementById('f_izq_leyenda').value.trim(),
+      cicatriz: document.querySelector('input[name="izq_cicatriz"]:checked').value
+    },
+    der: {
+      pit: document.getElementById('f_der_pit').value.trim(),
+      marca: document.getElementById('f_der_marca').value.trim(),
+      leyenda: document.getElementById('f_der_leyenda').value.trim(),
+      cicatriz: document.querySelector('input[name="der_cicatriz"]:checked').value
+    },
+    bio: {
+      mp: numOrNull('f_bio_mp'), pm: numOrNull('f_bio_pm'),
+      mm: numOrNull('f_bio_mm'), ancho: numOrNull('f_bio_ancho')
+    },
+    tumores: document.getElementById('f_tumores').checked,
+    observaciones: document.getElementById('f_observaciones').value.trim(),
+    createdAt: Date.now()
+  };
+
+  const existingIdx = fichas.findIndex(f=>f.id===id);
+  if(existingIdx >= 0){ record.createdAt = fichas[existingIdx].createdAt; fichas[existingIdx] = record; }
+  else { fichas.push(record); }
+
+  await persist();
+  resetForm();
+  showToast(existingIdx>=0 ? 'Ficha actualizada.' : 'Ficha guardada en la base de datos.');
+  showView('fichas');
+});
+function numOrNull(id){ const v = document.getElementById(id).value; return v==='' ? null : Number(v); }
+
+/* ============================================================
+   Limpieza de nido: reset / llenado / guardado
+   ============================================================ */
+function resetLimpiezaForm(){
+  document.getElementById('limpiezaForm').reset();
+  document.getElementById('l_id').value = '';
+  document.querySelectorAll('#conteoTableBody input').forEach(inp => inp.value = '');
+  ['l_hormigas','l_raices','l_larvas','l_piedras','l_huellas','l_otros'].forEach(id=> document.getElementById(id).value = '');
+  syncAllChips();
+  editingLimpiezaId = null;
+}
+function fillLimpiezaForm(l){
+  document.getElementById('l_id').value = l.id;
+  document.getElementById('l_numero').value = l.numero||'';
+  document.getElementById('l_playa').value = l.playa||'';
+  document.getElementById('l_corral').value = l.corral||'';
+  document.getElementById('l_nido').value = l.nido||'';
+  document.getElementById('l_fecha_emergencia').value = l.fecha_emergencia||'';
+  document.getElementById('l_fecha_limpieza').value = l.fecha_limpieza||'';
+  document.getElementById('l_especie').value = l.especie||'';
+  document.getElementById('l_formulo').value = l.formulo||'';
+  document.getElementById('l_uso_nido').value = l.uso_nido||'';
+  document.getElementById('l_lat').value = l.lat ?? '';
+  document.getElementById('l_lng').value = l.lng ?? '';
+  document.getElementById('l_hormigas').value = l.hormigas||'';
+  document.getElementById('l_raices').value = l.raices||'';
+  document.getElementById('l_larvas').value = l.larvas||'';
+  document.getElementById('l_piedras').value = l.piedras||'';
+  document.getElementById('l_huellas').value = l.huellas||'';
+  document.getElementById('l_otros').value = l.otros||'';
+  syncAllChips();
+  document.getElementById('l_otros_detalle').value = l.otros_detalle||'';
+  document.querySelectorAll('#conteoTableBody input').forEach(inp=>{
+    const cat = inp.dataset.cat, field = inp.dataset.field;
+    const val = l.conteos?.[cat]?.[field];
+    inp.value = (val===null || val===undefined) ? '' : val;
+  });
+}
+function readConteosFromForm(){
+  const conteos = {};
+  CATEGORIAS_CONTEO.forEach(cat=>{
+    const row = {normales:null, albina:null, deforme:null, albinas_deformes:null, total:null};
+    document.querySelectorAll(`#conteoTableBody input[data-cat="${cat.key}"]`).forEach(inp=>{
+      row[inp.dataset.field] = inp.value==='' ? null : Number(inp.value);
+    });
+    if(!cat.simple && row.total===null){
+      const sum = [row.normales,row.albina,row.deforme,row.albinas_deformes].reduce((s,v)=> s+(v||0), 0);
+      const anyValue = [row.normales,row.albina,row.deforme,row.albinas_deformes].some(v=>v!==null);
+      if(anyValue) row.total = sum;
+    }
+    conteos[cat.key] = row;
+  });
+  return conteos;
+}
+function hatchSuccess(l){
+  let vivas = 0, huevos = 0;
+  CATEGORIAS_CONTEO.forEach(cat=>{
+    const t = l.conteos?.[cat.key]?.total;
+    if(t===null || t===undefined) return;
+    if(cat.excludeFromEggs) return;
+    huevos += t;
+    if(cat.countsHatchlings) vivas += t;
+  });
+  return {vivas, huevos, pct: huevos>0 ? (vivas/huevos*100) : null};
+}
+document.getElementById('resetLimpiezaBtn').addEventListener('click', resetLimpiezaForm);
+document.getElementById('limpiezaForm').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const id = document.getElementById('l_id').value || ('l-'+Date.now());
+  const record = {
+    id,
+    numero: document.getElementById('l_numero').value.trim(),
+    playa: document.getElementById('l_playa').value.trim(),
+    corral: document.getElementById('l_corral').value.trim(),
+    nido: document.getElementById('l_nido').value.trim(),
+    fecha_emergencia: document.getElementById('l_fecha_emergencia').value,
+    fecha_limpieza: document.getElementById('l_fecha_limpieza').value,
+    especie: document.getElementById('l_especie').value.trim(),
+    formulo: document.getElementById('l_formulo').value.trim(),
+    uso_nido: document.getElementById('l_uso_nido').value,
+    lat: document.getElementById('l_lat').value ? Number(document.getElementById('l_lat').value) : null,
+    lng: document.getElementById('l_lng').value ? Number(document.getElementById('l_lng').value) : null,
+    conteos: readConteosFromForm(),
+    hormigas: document.getElementById('l_hormigas').value,
+    raices: document.getElementById('l_raices').value,
+    larvas: document.getElementById('l_larvas').value,
+    piedras: document.getElementById('l_piedras').value,
+    huellas: document.getElementById('l_huellas').value,
+    otros: document.getElementById('l_otros').value,
+    otros_detalle: document.getElementById('l_otros_detalle').value.trim(),
+    createdAt: Date.now()
+  };
+  const existingIdx = limpiezas.findIndex(l=>l.id===id);
+  if(existingIdx >= 0){ record.createdAt = limpiezas[existingIdx].createdAt; limpiezas[existingIdx] = record; }
+  else { limpiezas.push(record); }
+
+  await persistLimpiezas();
+  resetLimpiezaForm();
+  showToast(existingIdx>=0 ? 'Limpieza actualizada.' : 'Limpieza guardada en la base de datos.');
+  showLimpiezaSub('lista');
+});
+
+function renderLimpiezaTable(){
+  const q = (document.getElementById('limpiezaSearchInput').value||'').toLowerCase();
+  const rows = limpiezas.filter(l=>{
+    return !q || [l.numero,l.corral,l.nido,l.playa].some(v => (v||'').toString().toLowerCase().includes(q));
+  }).sort((a,b)=> (b.createdAt||0)-(a.createdAt||0));
+
+  const tbody = document.getElementById('limpiezaTableBody');
+  tbody.innerHTML = '';
+  document.getElementById('limpiezaEmptyState').style.display = rows.length ? 'none' : '';
+
+  rows.forEach(l=>{
+    const {vivas, huevos, pct} = hatchSuccess(l);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${escapeHtml(l.numero||'—')}</td>
+      <td>${formatDate(l.fecha_limpieza)}</td>
+      <td>${escapeHtml(l.corral||'—')}</td>
+      <td>${escapeHtml(l.nido||'—')}</td>
+      <td>${vivas}</td>
+      <td>${huevos}</td>
+      <td><span class="pill">${pct!==null ? pct.toFixed(1)+'%' : '—'}</span></td>
+      <td>
+        <div class="row-actions">
+          <button class="icon-btn" title="Editar" data-act="editL" data-id="${l.id}">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          </button>
+          <button class="icon-btn" title="Eliminar" data-act="delL" data-id="${l.id}">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+          </button>
+        </div>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+document.getElementById('limpiezaSearchInput').addEventListener('input', renderLimpiezaTable);
+document.getElementById('limpiezaTableBody').addEventListener('click', async e=>{
+  const btn = e.target.closest('button');
+  if(!btn) return;
+  const id = btn.dataset.id;
+  const l = limpiezas.find(x=>x.id===id);
+  if(!l) return;
+  if(btn.dataset.act==='editL'){ editingLimpiezaId=id; fillLimpiezaForm(l); showLimpiezaSub('nueva'); }
+  if(btn.dataset.act==='delL'){
+    if(!confirm('¿Eliminar este registro de limpieza de la base de datos?')) return;
+    limpiezas = limpiezas.filter(x=>x.id!==id);
+    await persistLimpiezas();
+    renderLimpiezaTable();
+    showToast('Registro de limpieza eliminado.');
+  }
+});
+
+/* ============================================================
+   Utils
+   ============================================================ */
+function escapeHtml(s){ return (s??'').toString().replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function formatDate(iso){
+  if(!iso) return '—';
+  const [y,m,d] = iso.split('-');
+  if(!y) return iso;
+  return `${d}/${m}/${y}`;
+}
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=> t.classList.remove('show'), 2600);
+}
+
+/* ============================================================
+   Init
+   ============================================================ */
+(async function init(){
+  await loadFichas();
+  await loadLimpiezas();
+  showView('panel');
+})();
+</script>
+</body>
+</html>
