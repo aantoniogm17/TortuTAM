@@ -67,6 +67,23 @@ dotnet tool run dotnet-ef database update --project src/TortuTAM.Api --startup-p
 
 Además, `Program.cs` llama a `Database.MigrateAsync()` al iniciar la aplicación, así que cualquier migración de Identity pendiente se aplica automáticamente al arrancar la API (igual que DbUp hará con los scripts T-SQL, pero por una vía separada). No se requiere un paso manual en un ambiente ya desplegado; el paso manual de arriba es solo para desarrollo/depuración.
 
+## Migraciones de dominio (DbUp)
+
+Las tablas de dominio (`fichas`, `cat_playas`, `marcas`, etc.) viven como scripts T-SQL numerados en `database/migrations/` y las aplica **DbUp**, no EF Core (ver sección anterior sobre por qué son dos mecanismos separados).
+
+Los scripts se embeben en el ensamblado en tiempo de compilación (`EmbeddedResource` en `TortuTAM.Api.csproj`), así que no dependen de que el árbol del repositorio esté presente donde corra la API. Al iniciar, `Program.cs` llama a `DatabaseMigrator.ApplyPendingMigrations` (`Services/DatabaseMigrator.cs`), que:
+
+- Aplica, contra `ConnectionStrings:DefaultConnection`, cualquier script de `database/migrations/` que todavía no se haya corrido en esa base de datos, en el orden numérico del prefijo `NNNN_`.
+- Registra cada script aplicado en una tabla propia, `dbo.SchemaVersions`, que DbUp crea automáticamente en la base de datos destino la primera vez que corre. Para ver qué migraciones ya se aplicaron en un ambiente:
+
+  ```sql
+  SELECT ScriptName, Applied FROM dbo.SchemaVersions ORDER BY Id;
+  ```
+
+- Si algún script falla, la API no llega a arrancar: la excepción se propaga sin capturarse, con el nombre del script y el error de SQL Server en el mensaje, para que la falla sea imposible de pasar por alto en los logs de arranque.
+
+No hace falta ningún paso manual para aplicar estos scripts en un ambiente ya desplegado; el paso relevante en desarrollo es solo tener `ConnectionStrings:DefaultConnection` configurado (ver la sección de configuración local arriba) y arrancar la API normalmente. Agregar un script nuevo a `database/migrations/` sigue la convención descrita en `database/migrations/README.md` (archivo `NNNN_verbo_objeto.sql`, no se editan scripts ya aplicados).
+
 ## Roles y cuenta semilla
 
 Al iniciar, `IdentitySeeder` (`Services/IdentitySeeder.cs`) garantiza que existan los tres roles (`UsuarioNormal`, `Administrador`, `Superadmin`) y, si no hay ninguna cuenta con el correo configurado en `IdentitySeed:SuperadminEmail`, crea una cuenta Superadmin con esas credenciales.
