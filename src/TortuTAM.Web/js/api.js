@@ -126,6 +126,10 @@
 
     obtenerEstadisticasPanel: function(limite){
       return request('/panel/estadisticas' + buildQueryString({ limite: limite }));
+    },
+
+    obtenerNidosMapa: function(){
+      return request('/nidos/mapa');
     }
   };
 })();

@@ -7,12 +7,15 @@
 <link rel="icon" href="img/icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <link rel="stylesheet" href="css/tokens.css">
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/layout.css">
 <link rel="stylesheet" href="css/forms.css">
 <link rel="stylesheet" href="css/listado.css">
 <link rel="stylesheet" href="css/panel.css">
+<link rel="stylesheet" href="css/mapa.css">
 </head>
 <body>
 
@@ -693,7 +696,43 @@
     </section>
 
     <section class="view" id="view-mapa" data-view="mapa" aria-labelledby="heading-mapa">
-      <div class="view-header"><h1 id="heading-mapa">Mapa de nidos</h1></div>
+      <div class="view-header">
+        <h1 id="heading-mapa">Mapa de nidos</h1>
+        <p class="view-subtitle">Ubicacion y estatus de limpieza de los nidos con coordenadas registradas.</p>
+      </div>
+
+      <div class="status-banner" id="mapaStatus" role="status" aria-live="polite"></div>
+
+      <div class="map-legend" id="mapaLegend">
+        <span class="map-legend-item"><span class="legend-dot legend-dot--sin-limpieza"></span>Sin limpieza registrada</span>
+        <span class="map-legend-item"><span class="legend-dot legend-dot--sin-conteo"></span>Limpiado, sin conteo</span>
+        <span class="map-legend-item"><span class="legend-dot legend-dot--exito-alto"></span>Limpiado, exito alto (&ge;50%)</span>
+        <span class="map-legend-item"><span class="legend-dot legend-dot--exito-bajo"></span>Limpiado, exito bajo (&lt;50%)</span>
+        <span class="map-legend-item"><span class="legend-dot legend-dot--sin-coordenadas"></span>Sin coordenadas (no se ubica en el mapa)</span>
+      </div>
+
+      <div class="map-columns">
+        <div class="map-panel">
+          <div class="map-canvas-wrap">
+            <div id="mapaNidosCanvas" class="map-canvas" role="application" aria-label="Mapa de ubicacion de nidos"></div>
+            <div class="map-empty-overlay" id="mapaEmptyOverlay" hidden>
+              <p>Ningun nido tiene coordenadas registradas todavia.</p>
+            </div>
+          </div>
+        </div>
+
+        <aside class="map-side" aria-label="Lista de nidos">
+          <div class="map-side-head">
+            <h2>Nidos</h2>
+            <span class="pill" id="mapaContador">0</span>
+          </div>
+          <div class="map-side-list" id="mapaSideList"></div>
+          <div class="empty-state" id="mapaEmptyState" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M9 20l-6-3V4l6 3 6-3 6 3v13l-6-3-6 3z"/><path d="M9 4v13M15 7v13"/></svg>
+            <p>Aun no hay nidos registrados.</p>
+          </div>
+        </aside>
+      </div>
     </section>
   </main>
 </div>
@@ -729,6 +768,7 @@
 <script src="js/limpieza-nueva.js"></script>
 <script src="js/limpiezas.js"></script>
 <script src="js/panel.js"></script>
+<script src="js/mapa-nidos.js"></script>
 <script src="js/nav.js"></script>
 </body>
 </html>

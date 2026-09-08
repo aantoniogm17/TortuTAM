@@ -1,0 +1,150 @@
+/*
+  Estilos de la vista "Mapa de nidos" (issue #14). Todo el codigo especifico
+  de Leaflet (inicializacion, capa de tiles, marcadores, popups) vive
+  aislado en js/mapa-nidos.js; este archivo solo define el layout de la
+  vista sobre los tokens de css/tokens.css y anula los estilos por defecto
+  de Leaflet para que respeten la paleta y los objetivos tactiles del
+  proyecto. Si el proveedor de mapa cambia en el futuro, las reglas
+  .leaflet-* de aqui abajo son las que probablemente haya que revisar.
+*/
+
+.map-legend{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px 18px;
+  margin-bottom:16px;
+  font-size:13px;
+  color:var(--ink-soft);
+}
+.map-legend-item{display:inline-flex; align-items:center; gap:7px;}
+
+.legend-dot{
+  display:inline-block;
+  width:11px;
+  height:11px;
+  border-radius:50%;
+  flex-shrink:0;
+  background:var(--line);
+}
+.legend-dot--sin-limpieza{background:var(--amber);}
+.legend-dot--sin-conteo{background:var(--ink-soft);}
+.legend-dot--exito-alto{background:var(--ocean-mid);}
+.legend-dot--exito-bajo{background:var(--coral);}
+.legend-dot--sin-coordenadas{background:var(--paper); border:1.5px dashed var(--ink-soft);}
+
+/* ---------- Mapa + lista lateral ---------- */
+.map-columns{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 300px;
+  gap:16px;
+  align-items:start;
+}
+
+.map-panel{
+  border:1px solid var(--line);
+  border-radius:var(--radius-card);
+  background:var(--sand);
+  overflow:hidden;
+}
+.map-canvas-wrap{position:relative;}
+.map-canvas{width:100%; height:520px;}
+
+.map-empty-overlay{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  text-align:center;
+  background:rgba(251,248,239,.92);
+}
+.map-empty-overlay[hidden]{display:none;}
+.map-empty-overlay p{margin:0; font-size:13.5px; color:var(--ink-soft); max-width:280px;}
+
+.map-side{
+  border:1px solid var(--line);
+  border-radius:var(--radius-card);
+  background:#fff;
+  display:flex;
+  flex-direction:column;
+  max-height:520px;
+  overflow:hidden;
+}
+.map-side-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:14px 16px;
+  border-bottom:1px solid var(--sand-dark);
+  flex-shrink:0;
+}
+.map-side-head h2{font-size:14px; font-weight:600;}
+
+.map-side-list{overflow-y:auto; -webkit-overflow-scrolling:touch;}
+
+.map-side-item{
+  display:block;
+  width:100%;
+  min-height:var(--touch-target-min);
+  padding:11px 16px;
+  border:none;
+  border-bottom:1px solid var(--sand-dark);
+  background:none;
+  text-align:left;
+  font-family:inherit;
+  cursor:pointer;
+  transition:background .15s ease;
+}
+.map-side-item:last-child{border-bottom:none;}
+.map-side-item:hover{background:var(--sand);}
+.map-side-item.is-active{background:var(--sand-dark);}
+.map-side-item:focus-visible{outline-offset:-2px;}
+
+.map-side-item .title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  font-weight:600;
+  color:var(--ocean-deep);
+  font-size:13.5px;
+}
+.map-side-item .sub{margin-top:2px; font-size:12px; color:var(--ink-soft);}
+.map-side-item .status-text{margin-top:3px; font-size:11.5px; color:var(--ink-soft);}
+.map-side-item.is-sin-coordenadas .status-text{color:var(--coral);}
+
+.map-side .empty-state{border:none; border-radius:0; padding:40px 18px;}
+
+/* ---------- Popups y controles de Leaflet ---------- */
+.leaflet-popup-content-wrapper{border-radius:2px;}
+.leaflet-popup-content{font-family:var(--font-body); font-size:13px; margin:12px 14px;}
+.leaflet-popup-content b{font-family:var(--font-display); font-size:14.5px; color:var(--ocean-deep);}
+.popup-row{display:flex; justify-content:space-between; gap:14px; padding:2px 0;}
+.popup-row .k{color:var(--ink-soft);}
+
+.leaflet-control-zoom a{
+  width:var(--touch-target-min);
+  height:var(--touch-target-min);
+  line-height:var(--touch-target-min);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width:980px){
+  .map-columns{grid-template-columns:minmax(0,1fr) 260px;}
+  .map-canvas{height:440px;}
+  .map-side{max-height:440px;}
+}
+
+@media (max-width:760px){
+  .map-columns{grid-template-columns:1fr;}
+  .map-canvas{height:360px;}
+  .map-side{max-height:320px;}
+}
+
+@media (max-width:480px){
+  .map-canvas{height:300px;}
+  .map-side{max-height:280px;}
+  .map-legend{gap:6px 14px; font-size:12px;}
+}
