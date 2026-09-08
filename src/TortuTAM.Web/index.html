@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="css/tokens.css">
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/forms.css">
 </head>
 <body>
 
@@ -65,7 +66,305 @@
     </section>
 
     <section class="view" id="view-nueva" data-view="nueva" aria-labelledby="heading-nueva">
-      <div class="view-header"><h1 id="heading-nueva">Nueva ficha</h1></div>
+      <div class="view-header">
+        <h1 id="heading-nueva">Nueva ficha</h1>
+        <p class="view-subtitle">Ficha de anidacion. Los campos marcados con * son obligatorios.</p>
+      </div>
+
+      <form id="fichaForm" novalidate>
+
+        <div class="form-section">
+          <h3>Datos generales</h3>
+          <div class="field-grid">
+            <div class="field">
+              <label for="f_numero">No. de ficha *</label>
+              <input type="text" id="f_numero" name="f_numero" required aria-describedby="err_f_numero">
+              <span class="field-error" id="err_f_numero"></span>
+            </div>
+            <div class="field">
+              <label for="f_playa">Playa *</label>
+              <select id="f_playa" name="f_playa" required aria-describedby="err_f_playa">
+                <option value="">Cargando...</option>
+              </select>
+              <span class="field-error" id="err_f_playa"></span>
+            </div>
+            <div class="field">
+              <label for="f_estaca">Estaca</label>
+              <input type="text" id="f_estaca" name="f_estaca" placeholder="19.3">
+            </div>
+            <div class="field">
+              <label for="f_zona">Zona</label>
+              <input type="text" id="f_zona" name="f_zona">
+            </div>
+          </div>
+          <div class="field-grid">
+            <div class="field">
+              <label for="f_fecha">Fecha *</label>
+              <input type="date" id="f_fecha" name="f_fecha" required aria-describedby="err_f_fecha">
+              <span class="field-error" id="err_f_fecha"></span>
+            </div>
+            <div class="field">
+              <label for="f_especie">Especie</label>
+              <select id="f_especie" name="f_especie">
+                <option value="">Cargando...</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="f_sexo">Sexo</label>
+              <select id="f_sexo" name="f_sexo">
+                <option value="">—</option>
+                <option value="H">Hembra (H)</option>
+                <option value="M">Macho (M)</option>
+                <option value="ND">No determinado (ND)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="f_formulo">Formulo (iniciales)</label>
+              <input type="text" id="f_formulo" name="f_formulo" placeholder="JA">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Ubicacion del nido</h3>
+          <div class="locate-row">
+            <div class="field">
+              <label for="f_lat">Latitud</label>
+              <input type="number" step="0.000001" inputmode="decimal" id="f_lat" name="f_lat" placeholder="22.2553" aria-describedby="err_f_lat">
+              <span class="field-error" id="err_f_lat"></span>
+            </div>
+            <div class="field">
+              <label for="f_lng">Longitud</label>
+              <input type="number" step="0.000001" inputmode="decimal" id="f_lng" name="f_lng" placeholder="-97.8611" aria-describedby="err_f_lng">
+              <span class="field-error" id="err_f_lng"></span>
+            </div>
+            <button type="button" class="btn ghost" id="f_locateBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+              Usar mi ubicacion
+            </button>
+          </div>
+          <p class="geo-status" id="f_geoStatus">Toca el boton parado junto al nido, o captura las coordenadas manualmente. Obligatorio solo si se registra un PIT en el marcado.</p>
+        </div>
+
+        <div class="form-section">
+          <h3>Accion, horarios y uso de nido</h3>
+          <div class="field-grid">
+            <div class="field">
+              <label for="f_accion">Accion</label>
+              <select id="f_accion" name="f_accion">
+                <option value="">Cargando...</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="f_uso_nido">Uso de nido</label>
+              <select id="f_uso_nido" name="f_uso_nido">
+                <option value="">Cargando...</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="f_corral">Corral</label>
+              <input type="text" id="f_corral" name="f_corral">
+            </div>
+            <div class="field">
+              <label for="f_numero_nido">Num. nido</label>
+              <input type="text" id="f_numero_nido" name="f_numero_nido">
+            </div>
+          </div>
+          <div class="field-grid cols-3">
+            <div class="field">
+              <label for="f_hora_a">Hora A (arribo)</label>
+              <input type="time" id="f_hora_a" name="f_hora_a">
+            </div>
+            <div class="field">
+              <label for="f_hora_b">Hora B (colecta)</label>
+              <input type="time" id="f_hora_b" name="f_hora_b">
+            </div>
+            <div class="field">
+              <label for="f_hora_c">Hora C (siembra)</label>
+              <input type="time" id="f_hora_c" name="f_hora_c">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Huevos</h3>
+          <div class="field-grid cols-3">
+            <div class="field">
+              <label for="f_huevos_colectados">Huevos colectados</label>
+              <input type="number" min="0" inputmode="numeric" id="f_huevos_colectados" name="f_huevos_colectados">
+            </div>
+            <div class="field">
+              <label for="f_huevos_rotos">Huevos rotos</label>
+              <input type="number" min="0" inputmode="numeric" id="f_huevos_rotos" name="f_huevos_rotos">
+            </div>
+          </div>
+          <div class="field">
+            <label id="posPickerLabel">Posicion (distancia a vegetacion)</label>
+            <div class="pos-picker" id="posPicker" role="group" aria-labelledby="posPickerLabel">
+              <button type="button" class="pos-card" data-pos="1" aria-pressed="false">
+                <svg viewBox="0 0 60 34" aria-hidden="true"><path d="M6 26 Q30 30 54 8" stroke="#4C5A54" stroke-width="1.5" fill="none"/><circle cx="10" cy="24" r="4" fill="#12463F"/></svg>
+                <div class="pos-num">1</div><div class="pos-range">&lt; 1 cm</div>
+              </button>
+              <button type="button" class="pos-card" data-pos="2" aria-pressed="false">
+                <svg viewBox="0 0 60 34" aria-hidden="true"><path d="M6 26 Q30 30 54 8" stroke="#4C5A54" stroke-width="1.5" fill="none"/><circle cx="18" cy="21" r="4" fill="#12463F"/></svg>
+                <div class="pos-num">2</div><div class="pos-range">1-4 cm</div>
+              </button>
+              <button type="button" class="pos-card" data-pos="3" aria-pressed="false">
+                <svg viewBox="0 0 60 34" aria-hidden="true"><path d="M6 26 Q30 30 54 8" stroke="#4C5A54" stroke-width="1.5" fill="none"/><circle cx="32" cy="16" r="4" fill="#12463F"/></svg>
+                <div class="pos-num">3</div><div class="pos-range">4-10 cm</div>
+              </button>
+              <button type="button" class="pos-card" data-pos="4" aria-pressed="false">
+                <svg viewBox="0 0 60 34" aria-hidden="true"><path d="M6 26 Q30 30 54 8" stroke="#4C5A54" stroke-width="1.5" fill="none"/><circle cx="47" cy="11" r="4" fill="#12463F"/></svg>
+                <div class="pos-num">4</div><div class="pos-range">&gt; 10 cm</div>
+              </button>
+            </div>
+            <input type="hidden" id="f_posicion" name="f_posicion">
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Marcado</h3>
+          <div class="fin-columns">
+            <div class="fin-col">
+              <h4>Aleta izquierda</h4>
+              <div class="field-grid cols-2">
+                <div class="field">
+                  <label for="f_izq_pit">PIT</label>
+                  <input type="text" id="f_izq_pit" name="f_izq_pit">
+                </div>
+                <div class="field">
+                  <label for="f_izq_marca">Marca</label>
+                  <input type="text" id="f_izq_marca" name="f_izq_marca">
+                </div>
+              </div>
+              <div class="field-grid cols-2">
+                <div class="field">
+                  <label for="f_izq_leyenda">Leyenda</label>
+                  <input type="text" id="f_izq_leyenda" name="f_izq_leyenda">
+                </div>
+                <div class="field">
+                  <label for="f_izq_nueva_recap">Nueva o recaptura</label>
+                  <select id="f_izq_nueva_recap" name="f_izq_nueva_recap">
+                    <option value="">—</option>
+                    <option value="N">Nueva (N)</option>
+                    <option value="R">Recaptura (R)</option>
+                  </select>
+                </div>
+              </div>
+              <fieldset class="field radio-fieldset">
+                <legend>Cicatriz de marca</legend>
+                <div class="radio-row">
+                  <label><input type="radio" name="izq_cicatriz" value="si"> Si</label>
+                  <label><input type="radio" name="izq_cicatriz" value="no" checked> No</label>
+                </div>
+              </fieldset>
+            </div>
+            <div class="fin-col">
+              <h4>Aleta derecha</h4>
+              <div class="field-grid cols-2">
+                <div class="field">
+                  <label for="f_der_pit">PIT</label>
+                  <input type="text" id="f_der_pit" name="f_der_pit">
+                </div>
+                <div class="field">
+                  <label for="f_der_marca">Marca</label>
+                  <input type="text" id="f_der_marca" name="f_der_marca">
+                </div>
+              </div>
+              <div class="field-grid cols-2">
+                <div class="field">
+                  <label for="f_der_leyenda">Leyenda</label>
+                  <input type="text" id="f_der_leyenda" name="f_der_leyenda">
+                </div>
+                <div class="field">
+                  <label for="f_der_nueva_recap">Nueva o recaptura</label>
+                  <select id="f_der_nueva_recap" name="f_der_nueva_recap">
+                    <option value="">—</option>
+                    <option value="N">Nueva (N)</option>
+                    <option value="R">Recaptura (R)</option>
+                  </select>
+                </div>
+              </div>
+              <fieldset class="field radio-fieldset">
+                <legend>Cicatriz de marca</legend>
+                <div class="radio-row">
+                  <label><input type="radio" name="der_cicatriz" value="si"> Si</label>
+                  <label><input type="radio" name="der_cicatriz" value="no" checked> No</label>
+                </div>
+              </fieldset>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Biometrias del caparazon</h3>
+          <div class="bio-diagram">
+            <svg viewBox="0 0 180 130" aria-hidden="true">
+              <ellipse cx="90" cy="65" rx="55" ry="42" fill="#EDE3CC" stroke="#4C5A54" stroke-width="1.4"/>
+              <path d="M90 23 L90 107" stroke="#C08A32" stroke-width="1.6" stroke-dasharray="3 3"/>
+              <path d="M45 65 L135 65" stroke="#AE4A30" stroke-width="1.6" stroke-dasharray="3 3"/>
+              <path d="M62 30 Q90 20 118 30" stroke="#12463F" stroke-width="1.6" fill="none"/>
+              <circle cx="90" cy="23" r="2.4" fill="#12463F"/>
+              <circle cx="90" cy="107" r="2.4" fill="#12463F"/>
+              <circle cx="45" cy="65" r="2.4" fill="#AE4A30"/>
+              <circle cx="135" cy="65" r="2.4" fill="#AE4A30"/>
+            </svg>
+            <div class="bio-diagram-legend">
+              <div><span style="background:#C08A32;"></span>Muesca-punta / punta-muesca (largo)</div>
+              <div><span style="background:#AE4A30;"></span>Muesca-muesca / ancho</div>
+              <div><span style="background:#12463F;"></span>Puntos de referencia de medicion</div>
+            </div>
+          </div>
+          <p class="hint">Medidas estandar tomadas entre muescas (m) y puntas (p) del caparazon, en centimetros.</p>
+          <div class="field-grid">
+            <div class="field">
+              <label for="f_bio_mp">Muesca-punta mas larga (cm)</label>
+              <input type="number" step="0.1" inputmode="decimal" id="f_bio_mp" name="f_bio_mp">
+            </div>
+            <div class="field">
+              <label for="f_bio_pm">Punta-muesca (cm)</label>
+              <input type="number" step="0.1" inputmode="decimal" id="f_bio_pm" name="f_bio_pm">
+            </div>
+            <div class="field">
+              <label for="f_bio_mm">Muesca-muesca (cm)</label>
+              <input type="number" step="0.1" inputmode="decimal" id="f_bio_mm" name="f_bio_mm">
+            </div>
+            <div class="field">
+              <label for="f_bio_ancho">Ancho (cm)</label>
+              <input type="number" step="0.1" inputmode="decimal" id="f_bio_ancho" name="f_bio_ancho">
+            </div>
+          </div>
+          <div class="checkbox-field">
+            <label><input type="checkbox" id="f_tumores" name="f_tumores"> Presencia de tumores / fibropapiloma</label>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Fotos</h3>
+          <p class="hint">Toma fotos con la camara del celular o elige varias desde la galeria.</p>
+          <div class="photo-picker" id="fotoPreview"></div>
+          <label class="btn ghost" for="f_fotos">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+            Agregar fotos
+          </label>
+          <input type="file" id="f_fotos" name="f_fotos" accept="image/*" multiple capture="environment" class="foto-file-input">
+        </div>
+
+        <div class="form-section">
+          <h3>Observaciones</h3>
+          <div class="field">
+            <label for="f_observaciones">Notas de campo</label>
+            <textarea id="f_observaciones" name="f_observaciones" placeholder="Notas de campo..."></textarea>
+          </div>
+        </div>
+
+        <div class="status-banner" id="fichaStatus" role="status" aria-live="polite"></div>
+
+        <div class="form-actions">
+          <button type="button" class="btn ghost" id="resetFormBtn">Limpiar</button>
+          <button type="submit" class="btn" id="guardarFichaBtn">Guardar ficha</button>
+        </div>
+      </form>
     </section>
 
     <section class="view" id="view-fichas" data-view="fichas" aria-labelledby="heading-fichas">
@@ -82,6 +381,8 @@
   </main>
 </div>
 
+<script src="js/api.js"></script>
+<script src="js/ficha-nueva.js"></script>
 <script src="js/nav.js"></script>
 </body>
 </html>
