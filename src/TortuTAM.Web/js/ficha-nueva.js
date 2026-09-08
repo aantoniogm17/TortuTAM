@@ -1,6 +1,16 @@
 /*
-  Logica del formulario "Nueva ficha" (vista #view-nueva, issue #11).
-  Depende de js/api.js (window.TortuTAM.api), que debe cargarse antes.
+  Logica del formulario "Nueva ficha" (vista #view-nueva, issue #11) y del
+  modo de edicion reutilizado por el listado de fichas (issue #12).
+
+  Depende de js/api.js (window.TortuTAM.api) y js/catalogos.js
+  (window.TortuTAM.catalogos), que deben cargarse antes.
+
+  El listado de fichas no duplica este formulario: reubica el mismo
+  elemento <form id="fichaForm"> dentro del drawer de detalle llamando a
+  TortuTAM.fichaForm.editar(detalle, opciones), y lo regresa a su lugar en
+  la vista "Nueva ficha" con TortuTAM.fichaForm.finalizarEdicion(). Asi
+  la validacion, los catalogos, el selector de posicion, la geolocalizacion
+  y el manejo de fotos se comparten sin repetir codigo ni marcado.
 
   Fuera de alcance aqui: la cola offline (guardar en IndexedDB/localStorage
   y reintentar al recuperar conexion) es del issue #15. Si el guardado
@@ -11,6 +21,14 @@
   if(!form) return;
 
   var api = window.TortuTAM && window.TortuTAM.api;
+  var catalogos = window.TortuTAM && window.TortuTAM.catalogos;
+
+  var formHomeParent = form.parentNode;
+  var formHomeSiguiente = form.nextSibling;
+
+  var modo = 'crear';
+  var fichaEditandoId = null;
+  var opcionesEdicion = null;
 
   var fotos = [];
   var fotoObjectUrls = [];
@@ -53,26 +71,26 @@
   }
 
   function cargarCatalogos(){
-    if(!api){
+    if(!catalogos){
       ['f_playa','f_especie','f_accion','f_uso_nido'].forEach(function(id){
         var select = document.getElementById(id);
         if(select){ select.innerHTML = '<option value="">No se pudo conectar con la API</option>'; select.disabled = true; }
       });
       return;
     }
-    llenarSelect(document.getElementById('f_playa'), api.getPlayas(), function(p){
+    llenarSelect(document.getElementById('f_playa'), catalogos.getPlayas(), function(p){
       return { value: p.id, label: p.codigo + ' - ' + p.nombre };
     }, 'Selecciona una playa');
 
-    llenarSelect(document.getElementById('f_especie'), api.getEspecies(), function(e){
+    llenarSelect(document.getElementById('f_especie'), catalogos.getEspecies(), function(e){
       return { value: e.codigo, label: e.nombreComun + ' (' + e.nombreCientifico + ')' };
     }, 'Selecciona una especie');
 
-    llenarSelect(document.getElementById('f_accion'), api.getAcciones(), function(a){
+    llenarSelect(document.getElementById('f_accion'), catalogos.getAcciones(), function(a){
       return { value: a.codigo, label: a.descripcion };
     }, '—');
 
-    llenarSelect(document.getElementById('f_uso_nido'), api.getUsoNido(), function(u){
+    llenarSelect(document.getElementById('f_uso_nido'), catalogos.getUsoNido(), function(u){
       return { value: u.codigo, label: u.descripcion };
     }, '—');
   }
@@ -98,6 +116,21 @@
       }
     });
   });
+
+  function setPosicion(codigo){
+    posButtons.forEach(function(b){
+      b.classList.remove('active');
+      b.setAttribute('aria-pressed', 'false');
+    });
+    posInput.value = '';
+    if(codigo === null || codigo === undefined || codigo === ''){ return; }
+    var objetivo = posButtons.filter(function(b){ return b.dataset.pos === String(codigo); })[0];
+    if(objetivo){
+      objetivo.classList.add('active');
+      objetivo.setAttribute('aria-pressed', 'true');
+      posInput.value = String(codigo);
+    }
+  }
 
   /* ---------------- Geolocalizacion ---------------- */
 
@@ -387,10 +420,102 @@
   }
 
   var resetBtn = document.getElementById('resetFormBtn');
+
+  /* ---------------- Modo edicion (reutilizado por el listado de fichas) ---------------- */
+
+  function populateMarca(prefijo, marca){
+    document.getElementById('f_' + prefijo + '_pit').value = (marca && marca.pit) || '';
+    document.getElementById('f_' + prefijo + '_marca').value = (marca && marca.numeroMarca) || '';
+    document.getElementById('f_' + prefijo + '_leyenda').value = (marca && marca.leyenda) || '';
+    document.getElementById('f_' + prefijo + '_nueva_recap').value = (marca && marca.nuevaORecap) || '';
+    var esCicatriz = !!(marca && marca.cicatrizMarca);
+    var radios = document.querySelectorAll('input[name="' + prefijo + '_cicatriz"]');
+    Array.prototype.forEach.call(radios, function(radio){
+      radio.checked = (radio.value === (esCicatriz ? 'si' : 'no'));
+    });
+  }
+
+  function populateForm(detalle){
+    document.getElementById('f_numero').value = detalle.numeroFicha || '';
+    document.getElementById('f_playa').value = detalle.playaId !== null && detalle.playaId !== undefined ? String(detalle.playaId) : '';
+    document.getElementById('f_estaca').value = detalle.estaca || '';
+    document.getElementById('f_zona').value = detalle.zona || '';
+    document.getElementById('f_fecha').value = detalle.fecha ? String(detalle.fecha).substring(0, 10) : '';
+    document.getElementById('f_especie').value = detalle.especieCodigo || '';
+    document.getElementById('f_sexo').value = detalle.sexo || '';
+    document.getElementById('f_formulo').value = detalle.formulo || '';
+
+    document.getElementById('f_lat').value = detalle.latitud !== null && detalle.latitud !== undefined ? detalle.latitud : '';
+    document.getElementById('f_lng').value = detalle.longitud !== null && detalle.longitud !== undefined ? detalle.longitud : '';
+
+    document.getElementById('f_accion').value = detalle.accionCodigo !== null && detalle.accionCodigo !== undefined ? String(detalle.accionCodigo) : '';
+    document.getElementById('f_uso_nido').value = detalle.usoNidoCodigo !== null && detalle.usoNidoCodigo !== undefined ? String(detalle.usoNidoCodigo) : '';
+    document.getElementById('f_corral').value = detalle.corral || '';
+    document.getElementById('f_numero_nido').value = detalle.numeroNido || '';
+    document.getElementById('f_hora_a').value = detalle.horaA || '';
+    document.getElementById('f_hora_b').value = detalle.horaBColecta || '';
+    document.getElementById('f_hora_c').value = detalle.horaCSiembra || '';
+
+    document.getElementById('f_huevos_colectados').value = detalle.huevosColectados !== null && detalle.huevosColectados !== undefined ? detalle.huevosColectados : '';
+    document.getElementById('f_huevos_rotos').value = detalle.huevosRotos !== null && detalle.huevosRotos !== undefined ? detalle.huevosRotos : '';
+    setPosicion(detalle.posicionCodigo);
+
+    var marcas = detalle.marcas || [];
+    populateMarca('izq', marcas.filter(function(m){ return m.aleta === 'izquierda'; })[0]);
+    populateMarca('der', marcas.filter(function(m){ return m.aleta === 'derecha'; })[0]);
+
+    document.getElementById('f_bio_mp').value = detalle.bioMuescaPuntaLargaCm !== null && detalle.bioMuescaPuntaLargaCm !== undefined ? detalle.bioMuescaPuntaLargaCm : '';
+    document.getElementById('f_bio_pm').value = detalle.bioPuntaMuescaCm !== null && detalle.bioPuntaMuescaCm !== undefined ? detalle.bioPuntaMuescaCm : '';
+    document.getElementById('f_bio_mm').value = detalle.bioMuescaMuescaCm !== null && detalle.bioMuescaMuescaCm !== undefined ? detalle.bioMuescaMuescaCm : '';
+    document.getElementById('f_bio_ancho').value = detalle.bioAnchoCm !== null && detalle.bioAnchoCm !== undefined ? detalle.bioAnchoCm : '';
+    document.getElementById('f_tumores').checked = !!detalle.tumoresPresentes;
+
+    document.getElementById('f_observaciones').value = detalle.observaciones || '';
+
+    fotos = [];
+    renderFotos();
+    clearAllFieldErrors();
+    clearStatus();
+    setGeoStatus('Coordenadas cargadas de la ficha. Actualizalas si es necesario.');
+  }
+
+  function finalizarEdicion(){
+    modo = 'crear';
+    fichaEditandoId = null;
+    opcionesEdicion = null;
+    submitBtn.textContent = 'Guardar ficha';
+    resetBtn.textContent = 'Limpiar';
+    formHomeParent.insertBefore(form, formHomeSiguiente);
+    clearStatus();
+  }
+
+  function cancelarEdicion(){
+    var alCancelar = opcionesEdicion && opcionesEdicion.onCancelar;
+    finalizarEdicion();
+    if(alCancelar){ alCancelar(); }
+  }
+
+  function editar(detalle, opciones){
+    opciones = opciones || {};
+    modo = 'editar';
+    fichaEditandoId = detalle.id;
+    opcionesEdicion = opciones;
+    populateForm(detalle);
+    if(opciones.contenedor){
+      opciones.contenedor.appendChild(form);
+    }
+    submitBtn.textContent = 'Guardar cambios';
+    resetBtn.textContent = 'Cancelar edicion';
+  }
+
   if(resetBtn){
     resetBtn.addEventListener('click', function(){
-      resetForm();
-      clearStatus();
+      if(modo === 'editar'){
+        cancelarEdicion();
+      }else{
+        resetForm();
+        clearStatus();
+      }
     });
   }
 
@@ -415,25 +540,41 @@
     }
 
     var payload = buildPayload();
-    setStatus('Guardando ficha...', 'loading');
+    var esEdicion = modo === 'editar';
+    var idEnEdicion = fichaEditandoId;
+    var callbackGuardado = opcionesEdicion && opcionesEdicion.onGuardado;
+
+    setStatus(esEdicion ? 'Guardando cambios...' : 'Guardando ficha...', 'loading');
     toggleSubmitting(true);
 
-    api.crearFicha(payload).then(function(ficha){
-      return subirFotosSiHay(ficha).then(function(resultadoFotos){
+    var promesaGuardado = esEdicion ? api.actualizarFicha(idEnEdicion, payload) : api.crearFicha(payload);
+
+    promesaGuardado.then(function(ficha){
+      var idParaFotos = esEdicion ? idEnEdicion : (ficha && ficha.id);
+      return subirFotosSiHay({ id: idParaFotos }).then(function(resultadoFotos){
         toggleSubmitting(false);
         if(resultadoFotos.fallidas > 0){
-          setStatus('Ficha ' + payload.numeroFicha + ' guardada, pero ' + resultadoFotos.fallidas + ' foto(s) no se pudieron subir. Intenta agregarlas de nuevo mas adelante.', 'warning');
+          setStatus((esEdicion ? 'Ficha actualizada' : 'Ficha ' + payload.numeroFicha + ' guardada') + ', pero ' + resultadoFotos.fallidas + ' foto(s) no se pudieron subir. Intenta agregarlas de nuevo mas adelante.', 'warning');
         }else{
-          setStatus('Ficha ' + payload.numeroFicha + ' guardada correctamente.', 'success');
-          resetForm();
+          setStatus(esEdicion ? 'Ficha actualizada correctamente.' : 'Ficha ' + payload.numeroFicha + ' guardada correctamente.', 'success');
+          if(!esEdicion){ resetForm(); }
+        }
+        if(esEdicion && callbackGuardado){
+          callbackGuardado({ id: idEnEdicion, numeroFicha: payload.numeroFicha });
         }
       });
     }).catch(function(err){
       toggleSubmitting(false);
-      setStatus('No se pudo guardar la ficha: ' + mensajeErrorGuardado(err), 'error');
+      setStatus((esEdicion ? 'No se pudo guardar los cambios: ' : 'No se pudo guardar la ficha: ') + mensajeErrorGuardado(err), 'error');
     });
   });
 
   cargarCatalogos();
   renderFotos();
+
+  window.TortuTAM = window.TortuTAM || {};
+  window.TortuTAM.fichaForm = {
+    editar: editar,
+    finalizarEdicion: finalizarEdicion
+  };
 })();

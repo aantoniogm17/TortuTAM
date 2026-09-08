@@ -67,6 +67,17 @@
     });
   }
 
+  function buildQueryString(params){
+    var esc = encodeURIComponent;
+    var partes = [];
+    Object.keys(params || {}).forEach(function(key){
+      var valor = params[key];
+      if(valor === undefined || valor === null || valor === ''){ return; }
+      partes.push(esc(key) + '=' + esc(valor));
+    });
+    return partes.length ? ('?' + partes.join('&')) : '';
+  }
+
   window.TortuTAM = window.TortuTAM || {};
   window.TortuTAM.api = {
     getPlayas: function(){ return request('/catalogos/playas'); },
@@ -76,6 +87,18 @@
 
     crearFicha: function(payload){
       return request('/fichas', { method:'POST', body: payload });
+    },
+
+    listarFichas: function(filtros){
+      return request('/fichas' + buildQueryString(filtros));
+    },
+
+    obtenerFicha: function(id){
+      return request('/fichas/' + id);
+    },
+
+    actualizarFicha: function(id, payload){
+      return request('/fichas/' + id, { method:'PUT', body: payload });
     },
 
     subirFoto: function(fichaId, file){

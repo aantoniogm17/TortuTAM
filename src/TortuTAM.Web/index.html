@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/layout.css">
 <link rel="stylesheet" href="css/forms.css">
+<link rel="stylesheet" href="css/listado.css">
 </head>
 <body>
 
@@ -368,7 +369,65 @@
     </section>
 
     <section class="view" id="view-fichas" data-view="fichas" aria-labelledby="heading-fichas">
-      <div class="view-header"><h1 id="heading-fichas">Fichas</h1></div>
+      <div class="view-header">
+        <h1 id="heading-fichas">Fichas</h1>
+        <p class="view-subtitle">Consulta las fichas de anidacion registradas y editalas si es necesario.</p>
+      </div>
+
+      <div class="toolbar">
+        <div class="field toolbar-field">
+          <label for="q_numero">No. de ficha</label>
+          <input type="text" id="q_numero" name="q_numero" placeholder="15681">
+        </div>
+        <div class="field toolbar-field">
+          <label for="q_pit">PIT</label>
+          <input type="text" id="q_pit" name="q_pit" placeholder="900000000...">
+        </div>
+        <div class="field toolbar-field grow">
+          <label for="q_playa">Playa</label>
+          <select id="q_playa" name="q_playa">
+            <option value="">Todas las playas</option>
+          </select>
+        </div>
+        <div class="field toolbar-field grow">
+          <label for="q_accion">Accion</label>
+          <select id="q_accion" name="q_accion">
+            <option value="">Todas las acciones</option>
+          </select>
+        </div>
+        <button type="button" class="btn ghost" id="q_limpiar">Limpiar filtros</button>
+      </div>
+
+      <div class="status-banner" id="fichasTablaStatus" role="status" aria-live="polite"></div>
+
+      <div class="table-scroll" id="fichasTableScroll">
+        <table>
+          <thead>
+            <tr>
+              <th>No. ficha</th>
+              <th>Fecha</th>
+              <th>Playa</th>
+              <th>Especie</th>
+              <th>Accion</th>
+              <th>Huevos</th>
+              <th>Corral</th>
+              <th><span class="sr-only">Acciones</span></th>
+            </tr>
+          </thead>
+          <tbody id="fichasTableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="empty-state" id="fichasEmptyState" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="10" cy="10" r="6"/><path d="M20 20l-4.3-4.3"/></svg>
+        <p>No hay fichas que coincidan con la busqueda.</p>
+      </div>
+
+      <div class="pagination">
+        <button type="button" class="btn ghost" id="fichasPrevBtn">Anterior</button>
+        <span class="page-info" id="fichasPageInfo"></span>
+        <button type="button" class="btn ghost" id="fichasNextBtn">Siguiente</button>
+      </div>
     </section>
 
     <section class="view" id="view-limpieza" data-view="limpieza" aria-labelledby="heading-limpieza">
@@ -381,8 +440,22 @@
   </main>
 </div>
 
+<div class="overlay" id="fichaDrawerOverlay" hidden>
+  <div class="drawer" id="fichaDrawer" role="dialog" aria-modal="true" aria-labelledby="fichaDrawerTitle" tabindex="-1">
+    <div class="drawer-head">
+      <h2 id="fichaDrawerTitle">Ficha</h2>
+      <button type="button" class="close-x" id="fichaDrawerClose" aria-label="Cerrar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div id="fichaDrawerBody"></div>
+  </div>
+</div>
+
 <script src="js/api.js"></script>
+<script src="js/catalogos.js"></script>
 <script src="js/ficha-nueva.js"></script>
+<script src="js/fichas.js"></script>
 <script src="js/nav.js"></script>
 </body>
 </html>
