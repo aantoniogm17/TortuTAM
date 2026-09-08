@@ -27,6 +27,8 @@ public class DominioDbContext(DbContextOptions<DominioDbContext> options) : DbCo
 
     public DbSet<VwExitoEclosion> VwExitoEclosion => Set<VwExitoEclosion>();
 
+    public DbSet<VwEstatusNido> VwEstatusNidos => Set<VwEstatusNido>();
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
@@ -222,6 +224,25 @@ public class DominioDbContext(DbContextOptions<DominioDbContext> options) : DbCo
             entity.Property(v => v.CriasVivasTotales).HasColumnName("crias_vivas_totales");
             entity.Property(v => v.HuevosTotales).HasColumnName("huevos_totales");
             entity.Property(v => v.PorcentajeEclosion).HasColumnName("porcentaje_eclosion");
+        });
+
+        builder.Entity<VwEstatusNido>(entity =>
+        {
+            entity.HasNoKey();
+            entity.ToView("vw_estatus_nidos");
+            entity.Property(v => v.FichaId).HasColumnName("ficha_id");
+            entity.Property(v => v.NumeroFicha).HasColumnName("numero_ficha");
+            entity.Property(v => v.Corral).HasColumnName("corral");
+            entity.Property(v => v.NumeroNido).HasColumnName("numero_nido");
+            entity.Property(v => v.Fecha).HasColumnName("fecha");
+            entity.Property(v => v.Latitud).HasColumnName("latitud");
+            entity.Property(v => v.Longitud).HasColumnName("longitud");
+            entity.Property(v => v.HuevosColectados).HasColumnName("huevos_colectados");
+            entity.Property(v => v.FichaLimpiezaId).HasColumnName("ficha_limpieza_id");
+            entity.Property(v => v.CriasVivasTotales).HasColumnName("crias_vivas_totales");
+            entity.Property(v => v.HuevosTotales).HasColumnName("huevos_totales");
+            entity.Property(v => v.PorcentajeEclosion).HasColumnName("porcentaje_eclosion");
+            entity.Property(v => v.Estatus).HasColumnName("estatus").HasMaxLength(30);
         });
     }
 }
