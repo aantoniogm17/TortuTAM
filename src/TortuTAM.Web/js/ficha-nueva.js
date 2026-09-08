@@ -271,10 +271,11 @@
     return {
       aleta: aleta,
       pit: pit || null,
-      marca: marca || null,
+      numeroMarca: marca || null,
       leyenda: leyenda || null,
       nuevaORecap: nuevaORecap || null,
-      cicatrizMarca: cicatriz
+      cicatrizMarca: cicatriz,
+      verifico: false
     };
   }
 
