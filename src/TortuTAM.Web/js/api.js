@@ -3,6 +3,10 @@
   vistas "Fichas" (#12), "Limpieza de nido" (#13) y "Mapa de nidos" (#14)
   reutilicen TortuTAM.api en lugar de repetir fetch() en cada una.
 
+  El GPS es siempre obligatorio al crear una limpieza (a diferencia de la
+  ficha de anidacion, donde solo es obligatorio si hay PIT); esa validacion
+  se hace en el cliente antes de llamar a crearLimpieza, no aqui.
+
   Autenticacion: el login real (ASP.NET Core Identity) todavia no esta
   construido. Mientras tanto se lee el token desde localStorage bajo la
   clave TOKEN_KEY, que es donde el futuro flujo de login debera guardarlo,
@@ -84,6 +88,7 @@
     getEspecies: function(){ return request('/catalogos/especies'); },
     getAcciones: function(){ return request('/catalogos/acciones'); },
     getUsoNido: function(){ return request('/catalogos/uso-nido'); },
+    getCategoriasConteo: function(){ return request('/catalogos/categorias-conteo'); },
 
     crearFicha: function(payload){
       return request('/fichas', { method:'POST', body: payload });
@@ -105,6 +110,18 @@
       var formData = new FormData();
       formData.append('foto', file);
       return request('/fichas/' + fichaId + '/fotos', { method:'POST', body: formData });
+    },
+
+    crearLimpieza: function(payload){
+      return request('/limpiezas', { method:'POST', body: payload });
+    },
+
+    listarLimpiezas: function(filtros){
+      return request('/limpiezas' + buildQueryString(filtros));
+    },
+
+    obtenerLimpieza: function(id){
+      return request('/limpiezas/' + id);
     }
   };
 })();

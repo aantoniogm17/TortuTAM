@@ -431,7 +431,238 @@
     </section>
 
     <section class="view" id="view-limpieza" data-view="limpieza" aria-labelledby="heading-limpieza">
-      <div class="view-header"><h1 id="heading-limpieza">Limpieza de nido</h1></div>
+      <div class="view-header">
+        <h1 id="heading-limpieza">Limpieza de nido</h1>
+        <p class="view-subtitle">Exhumacion y exito de eclosion. Los campos marcados con * son obligatorios.</p>
+      </div>
+
+      <div class="subview-tabs" role="tablist" aria-label="Subvistas de limpieza de nido">
+        <button type="button" class="btn small" id="tabLimpiezaNueva" role="tab" aria-selected="true" aria-controls="sub-limpieza-nueva" data-sub="nueva">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          Nueva limpieza
+        </button>
+        <button type="button" class="btn ghost small" id="tabLimpiezaLista" role="tab" aria-selected="false" aria-controls="sub-limpieza-lista" tabindex="-1" data-sub="lista">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+          Ver registros
+        </button>
+      </div>
+
+      <div id="sub-limpieza-nueva" role="tabpanel" aria-labelledby="tabLimpiezaNueva">
+        <form id="limpiezaForm" novalidate>
+          <input type="hidden" id="l_ficha_id">
+
+          <div class="form-section">
+            <h3>Datos generales</h3>
+            <div class="field-grid">
+              <div class="field">
+                <label for="l_numero">No. de ficha *</label>
+                <input type="text" id="l_numero" name="l_numero" required aria-describedby="err_l_numero l_numeroHint">
+                <span class="field-error" id="err_l_numero"></span>
+                <span class="hint" id="l_numeroHint"></span>
+              </div>
+              <div class="field">
+                <label for="l_playa">Playa</label>
+                <select id="l_playa" name="l_playa">
+                  <option value="">Cargando...</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="l_corral">Corral</label>
+                <input type="text" id="l_corral" name="l_corral">
+              </div>
+              <div class="field">
+                <label for="l_nido">Nido</label>
+                <input type="text" id="l_nido" name="l_nido">
+              </div>
+            </div>
+            <div class="field-grid">
+              <div class="field">
+                <label for="l_fecha_emergencia">Fecha 1a. emergencia</label>
+                <input type="date" id="l_fecha_emergencia" name="l_fecha_emergencia">
+              </div>
+              <div class="field">
+                <label for="l_fecha_limpieza">Fecha de limpieza *</label>
+                <input type="date" id="l_fecha_limpieza" name="l_fecha_limpieza" required aria-describedby="err_l_fecha_limpieza">
+                <span class="field-error" id="err_l_fecha_limpieza"></span>
+              </div>
+              <div class="field">
+                <label for="l_especie">Especie</label>
+                <select id="l_especie" name="l_especie">
+                  <option value="">Cargando...</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="l_formulo">Formulo (iniciales)</label>
+                <input type="text" id="l_formulo" name="l_formulo" placeholder="JA">
+              </div>
+            </div>
+            <div class="field">
+              <label for="l_uso_nido">Uso de nido</label>
+              <select id="l_uso_nido" name="l_uso_nido">
+                <option value="">Cargando...</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Ubicacion</h3>
+            <p class="hint">La ubicacion del nido es obligatoria en la limpieza, incluso si ya quedo registrada en la ficha de anidacion.</p>
+            <div class="locate-row">
+              <div class="field">
+                <label for="l_lat">Latitud *</label>
+                <input type="number" step="0.000001" inputmode="decimal" id="l_lat" name="l_lat" placeholder="22.2553" required aria-describedby="err_l_lat">
+                <span class="field-error" id="err_l_lat"></span>
+              </div>
+              <div class="field">
+                <label for="l_lng">Longitud *</label>
+                <input type="number" step="0.000001" inputmode="decimal" id="l_lng" name="l_lng" placeholder="-97.8611" required aria-describedby="err_l_lng">
+                <span class="field-error" id="err_l_lng"></span>
+              </div>
+              <button type="button" class="btn ghost" id="l_locateBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+                Usar mi ubicacion
+              </button>
+            </div>
+            <p class="geo-status" id="l_geoStatus">Toca el boton parado junto al nido, o captura las coordenadas manualmente.</p>
+          </div>
+
+          <div class="form-section">
+            <h3>Conteo de crias y huevos</h3>
+            <p class="hint">Captura solo los valores que aparecen en la ficha fisica; deja en blanco lo que no aplique. El total se calcula automaticamente si no lo indicas.</p>
+            <div class="table-scroll">
+              <table class="conteo-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Categoria</th>
+                    <th scope="col">Normales</th>
+                    <th scope="col">Albina</th>
+                    <th scope="col">Deforme</th>
+                    <th scope="col">Albinas y deformes</th>
+                    <th scope="col">Total</th>
+                  </tr>
+                </thead>
+                <tbody id="conteoTableBody">
+                  <tr><td colspan="6" class="cell-na">Cargando categorias...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Condiciones del nido</h3>
+            <div class="cond-grid">
+              <fieldset class="cond-item">
+                <legend class="cond-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="8" cy="12" r="2"/><circle cx="14" cy="9" r="1.6"/><circle cx="17" cy="14" r="1.4"/><path d="M8 12L2 9M8 12l-4 6M8 12l6-3M14 9l4-3M14 9l3 4M17 14l4 2"/></svg>Hormigas</legend>
+                <div class="chip-toggle" data-field="l_hormigas">
+                  <button type="button" data-val="S" aria-pressed="false">Si</button>
+                  <button type="button" data-val="N" aria-pressed="false">No</button>
+                </div>
+              </fieldset>
+              <fieldset class="cond-item">
+                <legend class="cond-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v8M12 11c-2 1-3 3-3 6M12 11c2 1 3 3 3 6M12 11c-4 0-6-2-7-5M12 11c4 0 6-2 7-5"/></svg>Raices</legend>
+                <div class="chip-toggle" data-field="l_raices">
+                  <button type="button" data-val="S" aria-pressed="false">Si</button>
+                  <button type="button" data-val="N" aria-pressed="false">No</button>
+                </div>
+              </fieldset>
+              <fieldset class="cond-item">
+                <legend class="cond-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 16c2-6 4-9 8-9s6 3 8 9"/><circle cx="4" cy="17" r="1.2"/><circle cx="20" cy="17" r="1.2"/></svg>Larvas</legend>
+                <div class="chip-toggle" data-field="l_larvas">
+                  <button type="button" data-val="S" aria-pressed="false">Si</button>
+                  <button type="button" data-val="N" aria-pressed="false">No</button>
+                </div>
+              </fieldset>
+              <fieldset class="cond-item">
+                <legend class="cond-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 17l3-8 5-3 5 3 3 8-8 3-8-3z"/></svg>Piedras</legend>
+                <div class="chip-toggle" data-field="l_piedras">
+                  <button type="button" data-val="S" aria-pressed="false">Si</button>
+                  <button type="button" data-val="N" aria-pressed="false">No</button>
+                </div>
+              </fieldset>
+              <fieldset class="cond-item">
+                <legend class="cond-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><ellipse cx="9" cy="8" rx="2.4" ry="3.2"/><ellipse cx="15" cy="16" rx="2.4" ry="3.2"/></svg>Huellas</legend>
+                <div class="chip-toggle" data-field="l_huellas">
+                  <button type="button" data-val="S" aria-pressed="false">Si</button>
+                  <button type="button" data-val="N" aria-pressed="false">No</button>
+                </div>
+              </fieldset>
+              <fieldset class="cond-item">
+                <legend class="cond-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>Otros</legend>
+                <div class="chip-toggle" data-field="l_otros">
+                  <button type="button" data-val="S" aria-pressed="false">Si</button>
+                  <button type="button" data-val="N" aria-pressed="false">No</button>
+                </div>
+              </fieldset>
+            </div>
+            <input type="hidden" id="l_hormigas">
+            <input type="hidden" id="l_raices">
+            <input type="hidden" id="l_larvas">
+            <input type="hidden" id="l_piedras">
+            <input type="hidden" id="l_huellas">
+            <input type="hidden" id="l_otros">
+            <div class="field">
+              <label for="l_otros_detalle">Detalle / observaciones</label>
+              <textarea id="l_otros_detalle" name="l_otros_detalle" placeholder="Notas de campo..."></textarea>
+            </div>
+          </div>
+
+          <div class="status-banner" id="l_status" role="status" aria-live="polite"></div>
+
+          <div class="form-actions">
+            <button type="button" class="btn ghost" id="resetLimpiezaBtn">Limpiar</button>
+            <button type="submit" class="btn" id="guardarLimpiezaBtn">Guardar limpieza</button>
+          </div>
+        </form>
+      </div>
+
+      <div id="sub-limpieza-lista" role="tabpanel" aria-labelledby="tabLimpiezaLista" hidden>
+        <div class="toolbar">
+          <div class="field toolbar-field">
+            <label for="lq_numero">No. de ficha</label>
+            <input type="text" id="lq_numero" name="lq_numero" placeholder="10933">
+          </div>
+          <div class="field toolbar-field">
+            <label for="lq_corral">Corral</label>
+            <input type="text" id="lq_corral" name="lq_corral">
+          </div>
+          <div class="field toolbar-field">
+            <label for="lq_nido">Nido</label>
+            <input type="text" id="lq_nido" name="lq_nido">
+          </div>
+          <button type="button" class="btn ghost" id="lq_limpiar">Limpiar filtros</button>
+        </div>
+
+        <div class="status-banner" id="lq_status" role="status" aria-live="polite"></div>
+
+        <div class="table-scroll" id="lq_tableScroll">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">No. ficha</th>
+                <th scope="col">Fecha limpieza</th>
+                <th scope="col">Corral</th>
+                <th scope="col">Nido</th>
+                <th scope="col">Crias vivas</th>
+                <th scope="col">Huevos totales</th>
+                <th scope="col">Exito</th>
+                <th scope="col"><span class="sr-only">Acciones</span></th>
+              </tr>
+            </thead>
+            <tbody id="lq_tableBody"></tbody>
+          </table>
+        </div>
+
+        <div class="empty-state" id="lq_emptyState" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><ellipse cx="12" cy="14" rx="7" ry="8"/><path d="M9 8c0-2 1.2-3.4 3-4"/></svg>
+          <p>No hay registros de limpieza que coincidan con la busqueda.</p>
+        </div>
+
+        <div class="pagination">
+          <button type="button" class="btn ghost" id="lq_prevBtn">Anterior</button>
+          <span class="page-info" id="lq_pageInfo"></span>
+          <button type="button" class="btn ghost" id="lq_nextBtn">Siguiente</button>
+        </div>
+      </div>
     </section>
 
     <section class="view" id="view-mapa" data-view="mapa" aria-labelledby="heading-mapa">
@@ -452,10 +683,24 @@
   </div>
 </div>
 
+<div class="overlay" id="limpiezaDrawerOverlay" hidden>
+  <div class="drawer" id="limpiezaDrawer" role="dialog" aria-modal="true" aria-labelledby="limpiezaDrawerTitle" tabindex="-1">
+    <div class="drawer-head">
+      <h2 id="limpiezaDrawerTitle">Limpieza</h2>
+      <button type="button" class="close-x" id="limpiezaDrawerClose" aria-label="Cerrar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div id="limpiezaDrawerBody"></div>
+  </div>
+</div>
+
 <script src="js/api.js"></script>
 <script src="js/catalogos.js"></script>
 <script src="js/ficha-nueva.js"></script>
 <script src="js/fichas.js"></script>
+<script src="js/limpieza-nueva.js"></script>
+<script src="js/limpiezas.js"></script>
 <script src="js/nav.js"></script>
 </body>
 </html>
