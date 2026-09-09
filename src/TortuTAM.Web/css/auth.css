@@ -15,6 +15,7 @@
   padding:24px 16px;
   background:var(--ocean-deep);
 }
+.auth-screen[hidden]{display:none;}
 
 .auth-card{
   width:100%;
