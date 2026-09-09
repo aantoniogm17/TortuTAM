@@ -98,11 +98,14 @@ const string PoliticaCorsDesarrollo = "PoliticaCorsDesarrollo";
 
 if (builder.Environment.IsDevelopment())
 {
+    var origenesCorsDesarrollo = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+        ?? ["http://localhost:8080", "http://localhost:5500"];
+
     builder.Services.AddCors(options =>
     {
         options.AddPolicy(PoliticaCorsDesarrollo, policy =>
         {
-            policy.WithOrigins("http://localhost:8080")
+            policy.WithOrigins(origenesCorsDesarrollo)
                 .AllowAnyHeader()
                 .AllowAnyMethod();
         });

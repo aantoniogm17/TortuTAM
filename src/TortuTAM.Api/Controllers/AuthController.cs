@@ -24,6 +24,11 @@ public class AuthController(
         }
 
         var resultado = await signInManager.CheckPasswordSignInAsync(usuario, request.Password, lockoutOnFailure: true);
+        if (resultado.IsLockedOut)
+        {
+            return Unauthorized(new { mensaje = "Cuenta bloqueada temporalmente por demasiados intentos fallidos. Intenta de nuevo en unos minutos." });
+        }
+
         if (!resultado.Succeeded)
         {
             return Unauthorized(new { mensaje = "Credenciales inválidas." });
