@@ -1,0 +1,101 @@
+/*
+  Estilos del dashboard (vista Panel, issue #10). Traduce el patron visual de
+  docs/referencia/index.html (stat-grid/stat-card, panel-grid/card,
+  bar-row/bar-track/bar-fill, recent-item) a un archivo propio sobre los
+  tokens de css/tokens.css.
+*/
+
+.stat-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+  margin-bottom:22px;
+}
+.stat-card{
+  background:var(--sand);
+  border:1px solid var(--line);
+  border-radius:var(--radius-card);
+  padding:18px 18px 16px;
+}
+.stat-card .num{
+  font-family:var(--font-display);
+  font-size:32px;
+  color:var(--ocean-deep);
+  font-weight:600;
+  line-height:1;
+  font-variant-numeric:tabular-nums;
+}
+.stat-card .lbl{font-size:12.5px; color:var(--ink-soft); margin-top:8px;}
+
+.panel-grid{
+  display:grid;
+  grid-template-columns:1.3fr 1fr;
+  gap:16px;
+}
+.card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:var(--radius-card);
+  padding:20px 22px;
+}
+.card h3{font-size:15px; font-weight:600; margin:0 0 14px;}
+
+/* ---------- Grafico de barras (huevos por playa) ---------- */
+.bar-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:9px;
+  font-size:13px;
+}
+.bar-row:last-child{margin-bottom:0;}
+.bar-row .bar-label{
+  width:88px;
+  flex-shrink:0;
+  color:var(--ink-soft);
+  font-variant-numeric:tabular-nums;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.bar-track{
+  flex:1;
+  height:9px;
+  background:var(--sand-dark);
+  border-radius:1px;
+  position:relative;
+}
+.bar-fill{height:100%; background:var(--ocean-mid); border-radius:1px;}
+.bar-val{width:40px; text-align:right; font-size:12.5px; color:var(--ink-soft); font-variant-numeric:tabular-nums;}
+
+/* ---------- Ultimas fichas ---------- */
+.recent-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  gap:10px;
+  padding:9px 0;
+  border-bottom:1px solid var(--sand-dark);
+  font-size:13.5px;
+}
+.recent-item:last-child{border-bottom:none;}
+.recent-item .meta{color:var(--ink-soft); font-size:12px; text-align:right; flex-shrink:0;}
+
+/* ---------- Responsive ---------- */
+@media (max-width:980px){
+  .stat-grid{grid-template-columns:repeat(2,1fr);}
+  .panel-grid{grid-template-columns:1fr;}
+}
+
+@media (max-width:760px){
+  .stat-grid{grid-template-columns:1fr 1fr;}
+  .card{padding:18px 16px;}
+  .recent-item{flex-direction:column; align-items:flex-start; gap:2px;}
+  .recent-item .meta{text-align:left;}
+}
+
+@media (max-width:480px){
+  .stat-grid{grid-template-columns:1fr 1fr;}
+  .stat-card{padding:14px 14px 12px;}
+  .stat-card .num{font-size:26px;}
+}
