@@ -1,5 +1,6 @@
 using System.Reflection;
 using DbUp;
+using DbUp.Helpers;
 using Microsoft.Extensions.Logging;
 
 namespace TortuTAM.Api.Services;
@@ -10,6 +11,8 @@ public static class DatabaseMigrator
 
     public static void ApplyPendingMigrations(string connectionString, ILogger logger)
     {
+        EnsureDatabase.For.SqlDatabase(connectionString);
+
         var upgrader = DeployChanges.To
             .SqlDatabase(connectionString)
             .WithScriptsEmbeddedInAssembly(

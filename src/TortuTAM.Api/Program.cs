@@ -94,11 +94,27 @@ builder.Services
 
 builder.Services.AddAuthorization();
 
+const string PoliticaCorsDesarrollo = "PoliticaCorsDesarrollo";
+
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy(PoliticaCorsDesarrollo, policy =>
+        {
+            policy.WithOrigins("http://localhost:8080")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+    });
+}
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseCors(PoliticaCorsDesarrollo);
 }
 
 app.UseAuthentication();
