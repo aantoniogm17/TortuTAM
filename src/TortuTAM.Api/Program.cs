@@ -120,6 +120,8 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapGet("/", () => Results.Text("Backend funcionando", "text/plain"));
+
 app.MapControllers();
 
 var dbUpLogger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("TortuTAM.Api.DatabaseMigrator");
