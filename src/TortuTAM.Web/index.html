@@ -18,12 +18,114 @@
 <link rel="stylesheet" href="css/listado.css">
 <link rel="stylesheet" href="css/panel.css">
 <link rel="stylesheet" href="css/mapa.css">
+<link rel="stylesheet" href="css/auth.css">
 </head>
 <body>
 
 <a class="skip-link" href="#main-content">Saltar al contenido</a>
 
-<div class="app">
+<div class="auth-screen" id="authScreen" hidden>
+  <div class="auth-card">
+    <div class="auth-brand">
+      <svg class="auth-brand-mark" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+        <ellipse cx="24" cy="26" rx="13" ry="11" fill="#C08A32"/>
+        <path d="M24 15c-3 0-5 2-5 2s2 2 5 2 5-2 5-2-2-2-5-2z" fill="#F3ECD9"/>
+        <path d="M13 20c-3-1-6 0-6 0s1 3 4 4" stroke="#F3ECD9" stroke-width="1.6" fill="none"/>
+        <path d="M35 20c3-1 6 0 6 0s-1 3-4 4" stroke="#F3ECD9" stroke-width="1.6" fill="none"/>
+        <path d="M14 34c-2 2-5 2-5 2s1-3 3-5" stroke="#F3ECD9" stroke-width="1.6" fill="none"/>
+        <path d="M34 34c2 2 5 2 5 2s-1-3-3-5" stroke="#F3ECD9" stroke-width="1.6" fill="none"/>
+        <path d="M17 20l3 5-3 5M31 20l-3 5 3 5M20 17l1 5-1 6M28 17l-1 5 1 6" stroke="#EADFC2" stroke-width="1"/>
+      </svg>
+      <div class="auth-brand-text">
+        <div class="name">Programa Binacional<br>Tortuga Lora</div>
+        <div class="sub">Acceso al sistema de captura</div>
+      </div>
+    </div>
+
+    <div class="auth-body">
+      <div class="auth-tabs" role="tablist" aria-label="Acceso a la cuenta">
+        <button type="button" class="auth-tab active" id="authTabLogin" role="tab" aria-selected="true" aria-controls="authPanelLogin">Entrar</button>
+        <button type="button" class="auth-tab" id="authTabRegistro" role="tab" aria-selected="false" aria-controls="authPanelRegistro" tabindex="-1">Crear cuenta</button>
+      </div>
+
+      <div id="authPanelLogin" role="tabpanel" aria-labelledby="authTabLogin">
+        <form id="loginForm" novalidate>
+          <div class="field">
+            <label for="login_email">Correo</label>
+            <input type="email" id="login_email" name="login_email" required autocomplete="username" inputmode="email" aria-describedby="err_login_email">
+            <span class="field-error" id="err_login_email"></span>
+          </div>
+          <div class="field">
+            <label for="login_password">Contraseña</label>
+            <div class="password-field">
+              <input type="password" id="login_password" name="login_password" required autocomplete="current-password" aria-describedby="err_login_password">
+              <button type="button" class="password-toggle" id="login_togglePassword" aria-label="Mostrar contraseña" aria-pressed="false">
+                <svg class="icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg class="icon-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 12s3.6-7 10-7c2 0 3.7.6 5.1 1.4M22 12s-1.1 2.1-3.2 3.9M9.9 9.9a3 3 0 0 0 4.2 4.2"/><path d="M3 3l18 18"/></svg>
+              </button>
+            </div>
+            <span class="field-error" id="err_login_password"></span>
+          </div>
+
+          <div class="status-banner" id="loginStatus" role="status" aria-live="polite"></div>
+
+          <div class="form-actions auth-actions">
+            <button type="submit" class="btn" id="loginSubmitBtn">Entrar</button>
+          </div>
+        </form>
+        <p class="auth-switch">¿No tienes cuenta? <button type="button" class="link-btn" id="goToRegistro">Crear una</button></p>
+      </div>
+
+      <div id="authPanelRegistro" role="tabpanel" aria-labelledby="authTabRegistro" hidden>
+        <form id="registroForm" novalidate>
+          <div class="field-grid cols-2">
+            <div class="field">
+              <label for="reg_nombre">Nombre</label>
+              <input type="text" id="reg_nombre" name="reg_nombre" required autocomplete="given-name" aria-describedby="err_reg_nombre">
+              <span class="field-error" id="err_reg_nombre"></span>
+            </div>
+            <div class="field">
+              <label for="reg_apellido">Apellido</label>
+              <input type="text" id="reg_apellido" name="reg_apellido" required autocomplete="family-name" aria-describedby="err_reg_apellido">
+              <span class="field-error" id="err_reg_apellido"></span>
+            </div>
+          </div>
+          <div class="field">
+            <label for="reg_email">Correo</label>
+            <input type="email" id="reg_email" name="reg_email" required autocomplete="email" inputmode="email" aria-describedby="err_reg_email">
+            <span class="field-error" id="err_reg_email"></span>
+          </div>
+          <div class="field">
+            <label for="reg_password">Contraseña</label>
+            <div class="password-field">
+              <input type="password" id="reg_password" name="reg_password" required autocomplete="new-password" aria-describedby="err_reg_password reg_passwordHint">
+              <button type="button" class="password-toggle" id="reg_togglePassword" aria-label="Mostrar contraseña" aria-pressed="false">
+                <svg class="icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg class="icon-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 12s3.6-7 10-7c2 0 3.7.6 5.1 1.4M22 12s-1.1 2.1-3.2 3.9M9.9 9.9a3 3 0 0 0 4.2 4.2"/><path d="M3 3l18 18"/></svg>
+              </button>
+            </div>
+            <span class="field-error" id="err_reg_password"></span>
+            <ul class="password-requirements" id="reg_passwordHint">
+              <li data-req="len">Minimo 8 caracteres</li>
+              <li data-req="upper">Una mayuscula</li>
+              <li data-req="lower">Una minuscula</li>
+              <li data-req="digit">Un digito</li>
+            </ul>
+          </div>
+
+          <div class="status-banner" id="registroStatus" role="status" aria-live="polite"></div>
+
+          <div class="form-actions auth-actions">
+            <button type="submit" class="btn" id="registroSubmitBtn">Crear cuenta</button>
+          </div>
+        </form>
+        <p class="auth-switch">¿Ya tienes cuenta? <button type="button" class="link-btn" id="goToLogin">Entrar</button></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="app" hidden>
   <aside class="sidebar">
     <div class="brand">
       <svg class="brand-mark" viewBox="0 0 48 48" fill="none" aria-hidden="true">
@@ -769,6 +871,7 @@
 </div>
 
 <script src="js/api.js"></script>
+<script src="js/auth.js"></script>
 <script src="js/sync-queue.js"></script>
 <script src="js/catalogos.js"></script>
 <script src="js/ficha-nueva.js"></script>
