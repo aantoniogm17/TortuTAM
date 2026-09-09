@@ -1,0 +1,151 @@
+/*
+  Pantalla de acceso (login / crear cuenta, issue #42). Bloque hermano de
+  .app en index.html: se muestra antes del shell principal cuando no hay
+  token valido en localStorage. Reutiliza .field, .btn, .field-grid,
+  .status-banner y .field-error de css/forms.css; este archivo solo agrega
+  el layout propio de la pantalla (tarjeta centrada, pestañas, campo de
+  contraseña con boton de mostrar/ocultar).
+*/
+
+.auth-screen{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px 16px;
+  background:var(--ocean-deep);
+}
+
+.auth-card{
+  width:100%;
+  max-width:420px;
+  background:var(--paper);
+  border-radius:var(--radius-card);
+  box-shadow:0 18px 40px rgba(12,42,39,.35);
+  overflow:hidden;
+}
+
+.auth-brand{
+  display:flex;
+  gap:12px;
+  align-items:flex-start;
+  padding:28px 28px 20px;
+  background:var(--ocean-deep);
+  color:var(--sand);
+}
+.auth-brand-mark{width:38px; height:38px; flex-shrink:0; margin-top:2px;}
+.auth-brand-text .name{font-family:var(--font-display); font-size:17px; line-height:1.25; color:var(--sand); font-weight:600;}
+.auth-brand-text .sub{font-size:11.5px; color:#9FB6AC; margin-top:4px; letter-spacing:.02em;}
+
+.auth-body{padding:24px 28px 28px;}
+
+.auth-tabs{display:flex; gap:4px; margin-bottom:20px; border-bottom:1px solid var(--line);}
+.auth-tab{
+  flex:1;
+  min-height:var(--touch-target-min);
+  padding:10px 8px;
+  border:none;
+  background:none;
+  cursor:pointer;
+  font-family:inherit;
+  font-size:14px;
+  font-weight:500;
+  color:var(--ink-soft);
+  border-bottom:2px solid transparent;
+  margin-bottom:-1px;
+  transition:color .15s ease, border-color .15s ease;
+}
+.auth-tab:hover{color:var(--ocean-deep);}
+.auth-tab.active{color:var(--ocean-deep); border-bottom-color:var(--amber);}
+
+#loginForm .field + .field,
+#loginForm .field + .status-banner,
+#registroForm .field-grid + .field,
+#registroForm .field + .field,
+#registroForm .field + .status-banner{margin-top:14px;}
+
+.password-field{position:relative; display:flex;}
+.password-field input{padding-right:46px;}
+.password-toggle{
+  position:absolute;
+  right:0;
+  top:0;
+  bottom:0;
+  width:44px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:none;
+  background:none;
+  color:var(--ink-soft);
+  cursor:pointer;
+  border-radius:2px;
+}
+.password-toggle:hover{color:var(--ocean-deep);}
+.password-toggle svg{width:19px; height:19px;}
+.password-toggle .icon-closed{display:none;}
+.password-toggle.is-visible .icon-open{display:none;}
+.password-toggle.is-visible .icon-closed{display:block;}
+
+.auth-actions{justify-content:stretch; margin-top:20px;}
+.auth-actions .btn{width:100%;}
+
+.auth-switch{
+  margin:18px 0 0;
+  font-size:13px;
+  color:var(--ink-soft);
+  text-align:center;
+}
+
+.link-btn{
+  background:none;
+  border:none;
+  padding:0 2px;
+  color:var(--amber-deep);
+  font-family:inherit;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  text-decoration:underline;
+  min-height:var(--touch-target-min);
+  display:inline-flex;
+  align-items:center;
+}
+
+.password-requirements{
+  list-style:none;
+  margin:8px 0 0;
+  padding:0;
+  display:grid;
+  gap:4px;
+}
+.password-requirements li{
+  font-size:11.5px;
+  color:var(--ink-soft);
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.password-requirements li::before{
+  content:'';
+  width:5px; height:5px;
+  border-radius:50%;
+  background:var(--line);
+  flex-shrink:0;
+}
+.password-requirements li.is-met{color:var(--ocean-mid);}
+.password-requirements li.is-met::before{background:var(--ocean-mid);}
+
+.status-banner .form-errors-list{
+  list-style:none;
+  margin:0;
+  padding:0;
+  display:grid;
+  gap:2px;
+}
+
+@media (max-width:480px){
+  .auth-screen{padding:0;}
+  .auth-card{max-width:none; min-height:100vh; border-radius:0; display:flex; flex-direction:column;}
+  .auth-body{flex:1;}
+}

@@ -7,11 +7,9 @@
   ficha de anidacion, donde solo es obligatorio si hay PIT); esa validacion
   se hace en el cliente antes de llamar a crearLimpieza, no aqui.
 
-  Autenticacion: el login real (ASP.NET Core Identity) todavia no esta
-  construido. Mientras tanto se lee el token desde localStorage bajo la
-  clave TOKEN_KEY, que es donde el futuro flujo de login debera guardarlo,
-  para poder probar endpoints que ya exigen Authorization sin bloquear el
-  desarrollo de este formulario.
+  Autenticacion: el token se lee desde localStorage bajo la clave
+  TOKEN_KEY. js/auth.js (issue #42) es quien lo guarda ahi tras un login o
+  registro exitoso, antes de recargar la pagina.
 */
 (function(){
   var TOKEN_KEY = 'tortutam_token';
@@ -84,6 +82,17 @@
 
   window.TortuTAM = window.TortuTAM || {};
   window.TortuTAM.api = {
+    // Unicos endpoints publicos: no requieren Authorization. buildHeaders
+    // igual agrega el header si ya hay un token viejo en localStorage, pero
+    // el servidor no lo exige aqui, asi que no rompe nada.
+    login: function(email, password){
+      return request('/auth/login', { method:'POST', body:{ email: email, password: password } });
+    },
+
+    registrar: function(payload){
+      return request('/auth/registro', { method:'POST', body: payload });
+    },
+
     getPlayas: function(){ return request('/catalogos/playas'); },
     getEspecies: function(){ return request('/catalogos/especies'); },
     getAcciones: function(){ return request('/catalogos/acciones'); },
