@@ -44,13 +44,20 @@
   function guardarSesion(data){
     try{
       localStorage.setItem(TOKEN_KEY, data.token);
+    }catch(e){
+      /* Sin localStorage disponible (modo privado estricto, cuota llena,
+         etc.) no hay forma de mantener sesion. Se avisa al llamador para
+         que no recargue como si hubiera funcionado. */
+      return false;
+    }
+    try{
       if(data.nombreCompleto){ localStorage.setItem(NOMBRE_KEY, data.nombreCompleto); }
       if(data.roles){ localStorage.setItem(ROLES_KEY, JSON.stringify(data.roles)); }
     }catch(e){
-      /* Sin localStorage disponible (modo privado estricto, etc.) no hay
-         forma de mantener sesion; se deja seguir para no bloquear con un
-         error confuso, pero al recargar volvera a pedir acceso. */
+      /* El token (lo minimo indispensable) ya quedo guardado; si estos
+         datos secundarios fallan no se considera fallo de la sesion. */
     }
+    return true;
   }
 
   function mostrarAcceso(){
@@ -236,13 +243,17 @@
       loginSubmitBtn.disabled = true;
 
       api.login(val('login_email'), val('login_password')).then(function(data){
+        if(!guardarSesion(data)){
+          loginSubmitBtn.disabled = false;
+          setStatus(loginStatus, 'No se pudo guardar la sesión en este navegador (almacenamiento bloqueado o modo privado). Habilita el almacenamiento local e intenta de nuevo.', 'error');
+          return;
+        }
         clearStatus(loginStatus);
-        guardarSesion(data);
         location.reload();
       }).catch(function(err){
         loginSubmitBtn.disabled = false;
         if(err && err.status === 401){
-          setStatus(loginStatus, 'Correo o contraseña incorrectos.', 'error');
+          setStatus(loginStatus, (err.data && err.data.mensaje) || 'Correo o contraseña incorrectos.', 'error');
         } else if(esFallaDeRed(err)){
           setStatus(loginStatus, 'No hay conexion con el servidor. Verifica tu conexion e intenta de nuevo.', 'error');
         } else {
@@ -314,8 +325,12 @@
       registroSubmitBtn.disabled = true;
 
       api.registrar(payload).then(function(data){
+        if(!guardarSesion(data)){
+          registroSubmitBtn.disabled = false;
+          setStatus(registroStatus, 'No se pudo guardar la sesión en este navegador (almacenamiento bloqueado o modo privado). Habilita el almacenamiento local e intenta de nuevo.', 'error');
+          return;
+        }
         clearStatus(registroStatus);
-        guardarSesion(data);
         location.reload();
       }).catch(function(err){
         registroSubmitBtn.disabled = false;
