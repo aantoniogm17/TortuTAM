@@ -1,0 +1,34 @@
+/*
+  Tokens de diseño de TortuTAM.
+  Paleta e identidad tomadas del boceto de referencia (docs/referencia/index.html),
+  no se modifican aquí; este archivo solo las expone como variables reutilizables
+  para todo el CSS del proyecto.
+
+  Breakpoints del sistema (usados como valores literales en @media, ya que las
+  media queries no pueden leer custom properties): 480px / 760px / 980px.
+*/
+:root{
+  --ocean-deep:#0C2A27;
+  --ocean-mid:#12463F;
+  --ocean-line:#1D5C51;
+  --sand:#F3ECD9;
+  --sand-dark:#E1D3AE;
+  --paper:#FBF8EF;
+  --amber:#C08A32;
+  --amber-deep:#9C6B22;
+  --coral:#AE4A30;
+  --ink:#182420;
+  --ink-soft:#4C5A54;
+  --line:#D8CDAE;
+  --radius-card:3px;
+
+  --font-display:'Fraunces', serif;
+  --font-body:'Work Sans', sans-serif;
+
+  --sidebar-width:230px;
+
+  --focus-ring-color:var(--amber);
+  --focus-ring-width:2px;
+
+  --touch-target-min:44px;
+}

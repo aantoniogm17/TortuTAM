@@ -1,4 +1,4 @@
--- Migración: 0016
+-- Migración: 0019
 -- Fecha: 2026-09-17
 -- Cambio: siembra cat_playas con las playas del protocolo oficial (ver
 -- docs/protocolo-captura-lora.md). Códigos en minúsculas por la regla

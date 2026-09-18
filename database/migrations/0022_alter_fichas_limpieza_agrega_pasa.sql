@@ -1,4 +1,4 @@
--- Migración: 0019
+-- Migración: 0022
 -- Fecha: 2026-09-17
 -- Cambio: agrega a fichas_limpieza el campo "pasa", documentado en el
 -- protocolo oficial de captura (ver docs/protocolo-captura-lora.md).

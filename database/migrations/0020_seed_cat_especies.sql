@@ -1,4 +1,4 @@
--- Migración: 0017
+-- Migración: 0020
 -- Fecha: 2026-09-17
 -- Cambio: siembra cat_especies con los códigos oficiales del protocolo
 -- (ver docs/protocolo-captura-lora.md). Se usa "lk" para lora, no "LO"

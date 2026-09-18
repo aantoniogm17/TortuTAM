@@ -1,4 +1,4 @@
--- Migración: 0018
+-- Migración: 0021
 -- Fecha: 2026-09-17
 -- Cambio: agrega a fichas los campos "protegido" y "compl_div_jun" que
 -- documenta el protocolo oficial de captura y que no existían en el

@@ -1,4 +1,4 @@
--- Migración: 0015
+-- Migración: 0018
 -- Fecha: 2026-09-17
 -- Cambio: agrega a cat_uso_nido los códigos 10 (Muerta, para varamientos)
 -- y 13 (Sólo nido sin tortuga - picado), que faltaban respecto al
