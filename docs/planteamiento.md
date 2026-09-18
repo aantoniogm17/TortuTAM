@@ -32,17 +32,25 @@ Autenticación vía ASP.NET Core Identity. El inicio de sesión requiere conexi�
 
 ## Pendientes
 
-- **Alcance de especies**: confirmado con el equipo de campo (reunión 2026-09-07) que son **5 especies**. Falta el listado con nombre común/científico de cada una para poder sembrar `cat_especies`.
-- **Alcance de playas**: 6 playas confirmadas — Miramar, Altamira, Tepehuajes, La Pesca, Mezquital, Playa Bagdad. Qué implica "binacional" en este proyecto sigue sin definir. Se documentará como issue antes de tocar `cat_playas`.
+- **"Binacional"**: sigue sin resolverse qué significa en este proyecto — el protocolo no lo menciona (contacto y glosario apuntan a Tamaulipas/Veracruz, México, no a otro país).
+- **Códigos de uso de nido 1/2 y 3/4**: el protocolo lista dos códigos para lo que parece ser el mismo destino (corral, caja) sin explicar la diferencia; no se agregaron esos códigos adicionales a `cat_uso_nido` hasta saber qué los distingue.
 - **Catálogo de corrales por playa**: cada playa debe limitar sus corrales a un conjunto propio (dropdown condicionado), pero la cantidad y nombres de corrales por playa aún no están corroborados por el equipo de campo. Bloqueado hasta esa corroboración.
-- **Captura de temperaturas**: nueva funcionalidad pedida por el equipo de campo, sin tabla en el esquema actual ni estructura definida (¿lectura única por nido, serie de lecturas por fecha/hora?). Pendiente de detallar antes de abrir issue.
-- **Catálogo previo de usuarios**: antes del alta en el login se debe registrar nombre, código e iniciales de cada brigadista. Se resuelve junto con el issue #8 (scaffolding de Identity).
+- **Captura de temperaturas**: ya existe `fichas.temperatura_c` como solución interina; falta definir si se necesita una estructura más rica (lectura única por nido, o serie de lecturas por fecha/hora).
+- **Catálogo previo de usuarios**: antes del alta en el login se debe registrar nombre, código e iniciales de cada brigadista.
 - **Consulta rápida de tortuga por PIT**: si la tortuga ya está identificada, se debe poder buscarla por PIT y modificar solo ciertos parámetros en vez de capturar una ficha nueva completa. Pendiente de detallar como issue (endpoint de búsqueda + edición parcial).
-- **Coordenadas GPS**: por ahora solo se capturan para tortugas con marca PIT (no en cualquier avistamiento). Confirmado, sin cambio de esquema necesario (`fichas.latitud`/`longitud` ya cubre el caso).
 - **Número de nido**: la numeración/consecutivo la compartirá el equipo de campo más adelante; no tocar `fichas.numero_nido` hasta recibirla.
+- **Modelo C# de las columnas nuevas**: `fichas.protegido`, `fichas.compl_div_jun` y `fichas_limpieza.pasa` (migraciones 0021-0022) todavía no están reflejadas en `Models/Dominio/Ficha.cs` / `FichaLimpieza.cs`, ni en los contratos/controladores del backend. Falta ese trabajo para que la API las exponga.
 - **Modificaciones a la base de datos**: hay cambios pendientes según información y requerimientos ya recibidos del cliente, todavía no consolidados. Se irán resolviendo por issue.
-- **Puerto del esquema a T-SQL**: el esquema heredado (`database/schema/esquema_base_datos.sql`) está en sintaxis MySQL/MariaDB.
 - **Relación `fichas_limpieza` ↔ `fichas`**: existen dos caminos (la llave foránea `ficha_anidacion_id` y el emparejamiento por corral+nido usado en `vw_estatus_nidos`); falta decidir si se deja solo la FK como fuente de verdad.
+
+## Decisiones ya tomadas a partir del protocolo oficial
+
+- **Especies**: se sembró `cat_especies` con las 5 del protocolo (lora `lk`, verde `cm`, caguama `cc`, laúd `dc`, carey `ei`) — el proyecto se centra en la tortuga lora, pero el protocolo real registra las 5 especies que anidan en las mismas playas.
+- **Código de la lora**: se usa `lk` (protocolo oficial), no `LO` como en el esquema heredado.
+- **Playas**: se sembró `cat_playas` con las 5 del protocolo oficial (Rancho Nuevo, Tepehuajes, Barra del Tordo, Altamira, Miramar). Esto reemplaza — por decisión explícita del responsable del proyecto — una confirmación previa de 6 playas distintas (Miramar, Altamira, Tepehuajes, La Pesca, Mezquital, Playa Bagdad) que se había registrado antes en este mismo documento tras una reunión con el equipo de campo.
+- **Varamientos**: se mantienen como están hoy (valores 9/10 del campo `accion_codigo` dentro de `fichas`), sin tabla propia por ahora.
+- **Campos de clasificación de nidada**: se agregaron `protegido` y `compl_div_jun` a `fichas`, y `pasa` a `fichas_limpieza`.
+- **Coordenadas GPS**: solo se capturan para tortugas con marca PIT (no en cualquier avistamiento); no requiere cambio de esquema (`fichas.latitud`/`longitud` ya cubre el caso).
 
 ## Reglas de trabajo
 
