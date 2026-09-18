@@ -18,3 +18,4 @@
 | 0012 | 2026-09-07 | Crea vista `vw_exito_eclosion`. |
 | 0013 | 2026-09-07 | Crea vista `vw_estatus_nidos`. |
 | 0014 | 2026-09-07 | Crea índices de apoyo (fecha, playa, PIT, corral/nido). |
+| 0015 | 2026-09-17 | Agrega a `cat_uso_nido` los códigos 10 y 13, faltantes según el protocolo oficial (ver `docs/protocolo-captura-lora.md`). |
