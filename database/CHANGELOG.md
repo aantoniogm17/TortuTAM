@@ -19,3 +19,7 @@
 | 0013 | 2026-09-07 | Crea vista `vw_estatus_nidos`. |
 | 0014 | 2026-09-07 | Crea índices de apoyo (fecha, playa, PIT, corral/nido). |
 | 0015 | 2026-09-17 | Agrega a `cat_uso_nido` los códigos 10 y 13, faltantes según el protocolo oficial (ver `docs/protocolo-captura-lora.md`). |
+| 0016 | 2026-09-17 | Siembra `cat_playas` con las 5 playas del protocolo oficial. |
+| 0017 | 2026-09-17 | Siembra `cat_especies` con las 5 especies del protocolo oficial (código de lora: `lk`). |
+| 0018 | 2026-09-17 | Agrega a `fichas` los campos `protegido` y `compl_div_jun` del protocolo oficial. |
+| 0019 | 2026-09-17 | Agrega a `fichas_limpieza` el campo `pasa` del protocolo oficial. |

@@ -32,12 +32,18 @@ Autenticación vía ASP.NET Core Identity. El inicio de sesión requiere conexi�
 
 ## Pendientes
 
-- **Alcance de especies, playas**: el protocolo oficial de captura (`docs/protocolo-captura-lora.md`) documenta 5 especies (lora, verde, caguama, laúd, carey) y 5 playas de ejemplo (Rancho Nuevo, Tepehuajes, Barra del Tordo, Altamira, Miramar), pero deja explícito que esa lista de playas se debe completar por proyecto. Falta confirmar cuáles de esas especies y playas aplican realmente a TortuTAM antes de sembrar `cat_especies`/`cat_playas`. Sigue sin resolverse qué significa "binacional" en este proyecto — el protocolo no lo menciona (contacto y glosario apuntan a Tamaulipas/Veracruz, México, no a otro país).
-- **Varamientos como concepto de datos propio**: el protocolo los captura en una hoja separada de "mortalidad", no como parte de la ficha de anidación. El esquema actual solo los modela como valores del campo `accion_codigo` dentro de `fichas`. Falta decidir si se necesita una tabla propia.
-- **Campos de clasificación de nidada**: el protocolo usa `protegido` (s/n), `compl/div/jun` (tipo de siembra) y `pasa` (válido para análisis estadístico), ninguno presente hoy en el esquema. Falta decidir si se agregan y cuándo.
-- **Códigos de uso de nido 1/2 y 3/4**: el protocolo lista dos códigos para lo que parece ser el mismo destino (corral, caja) sin explicar la diferencia en las páginas disponibles del documento.
+- **"Binacional"**: sigue sin resolverse qué significa en este proyecto — el protocolo no lo menciona (contacto y glosario apuntan a Tamaulipas/Veracruz, México, no a otro país).
+- **Playas fuera de las 5 sembradas**: se sembró `cat_playas` con las 5 del protocolo oficial (Rancho Nuevo, Tepehuajes, Barra del Tordo, Altamira, Miramar). Si el proyecto cubre alguna playa adicional, se agrega por issue.
+- **Códigos de uso de nido 1/2 y 3/4**: el protocolo lista dos códigos para lo que parece ser el mismo destino (corral, caja) sin explicar la diferencia; no se agregaron esos códigos adicionales a `cat_uso_nido` hasta saber qué los distingue.
 - **Modificaciones a la base de datos**: hay cambios pendientes según información y requerimientos ya recibidos del cliente, todavía no consolidados. Se irán resolviendo por issue.
 - **Relación `fichas_limpieza` ↔ `fichas`**: existen dos caminos (la llave foránea `ficha_anidacion_id` y el emparejamiento por corral+nido usado en `vw_estatus_nidos`); falta decidir si se deja solo la FK como fuente de verdad.
+
+## Decisiones ya tomadas a partir del protocolo oficial
+
+- **Especies**: se sembró `cat_especies` con las 5 del protocolo (lora `lk`, verde `cm`, caguama `cc`, laúd `dc`, carey `ei`) — el proyecto se centra en la tortuga lora, pero el protocolo real registra las 5 especies que anidan en las mismas playas.
+- **Código de la lora**: se usa `lk` (protocolo oficial), no `LO` como en el esquema heredado.
+- **Varamientos**: se mantienen como están hoy (valores 9/10 del campo `accion_codigo` dentro de `fichas`), sin tabla propia por ahora.
+- **Campos de clasificación de nidada**: se agregaron `protegido` y `compl_div_jun` a `fichas`, y `pasa` a `fichas_limpieza`.
 
 ## Reglas de trabajo
 

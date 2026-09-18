@@ -110,7 +110,7 @@ Tres medidas, en cm con un decimal, tomadas siempre en curvo con cinta (no verni
 - **No protegida**: no se le dio seguimiento (pérdida total sin revisión, o nidos reubicados al final de temporada sin seguimiento, o saqueados del vivero sin conocerse el resultado).
 - **Tipo de siembra**: completa (`c`, tal como se colectó), dividida (`d`, huevos de una misma nidada sembrados en dos estacas), o juntada (`j`, nidadas de dos tortugas sembradas en un mismo nido) — estas dos últimas están fuera de práctica recomendada pero se registran si ocurrieron.
 
-Ninguno de estos tres campos existe hoy en `fichas`.
+`protegido` y `compl_div_jun` ya se agregaron a `fichas` (migración 0018).
 
 ## Limpieza / revisión de nido
 
@@ -118,6 +118,7 @@ Categorías de conteo (coinciden con `cat_categorias_conteo` del repositorio): c
 
 - "Huellas" alrededor del nido: hormigas, raíces, larvas, piedras, huellas de depredador, otros — `s`/`n`/vacío si no hay dato. Coincide con los campos ya presentes en `fichas_limpieza`.
 - Fecha de limpieza puede diferir de la fecha de primera emergencia (días después).
+- `pasa` ya se agregó a `fichas_limpieza` (migración 0019).
 
 ## Mortalidad (varamientos)
 
@@ -150,10 +151,10 @@ Esto es distinto al esquema actual del repositorio, donde "varada viva"/"varada 
 
 ## Discrepancias encontradas vs. el esquema actual del repositorio
 
-1. **Código de especie de la lora**: protocolo usa `lk`, el esquema heredado usaba `LO`. Como `cat_especies` no tiene datos semilla todavía, no hay conflicto de datos — pero hay que decidir con cuál convención se siembra.
-2. **`cat_uso_nido` incompleto**: faltaban los códigos 10 (Muerta, para varamientos) y 13 (Sólo nido sin tortuga - picado). Corregido en esta rama.
-3. **Varamientos como tabla propia**: el protocolo los trata en una hoja separada de "MORTALIDAD"; el esquema actual solo los modela como valores de `accion_codigo` (9 y 10) dentro de `fichas`. No se resuelve en esta rama.
-4. **Campos de clasificación de nidada ausentes**: `protegido` (s/n), `compl/div/jun` (tipo de siembra) y `pasa` (s/n/d, válido para análisis estadístico) no existen hoy en `fichas` ni en `fichas_limpieza`. No se resuelven en esta rama.
-5. **Códigos 1/2 (Corral) y 3/4 (Caja)**: el protocolo lista dos códigos para lo que parece ser el mismo destino, sin explicar la diferencia en las páginas revisadas. No se resuelve en esta rama.
+1. **Código de especie de la lora**: resuelto — se sembró `cat_especies` usando `lk` (protocolo oficial), no `LO` como en el esquema heredado (migración 0017).
+2. **`cat_uso_nido` incompleto**: resuelto — se agregaron los códigos 10 (Muerta, para varamientos) y 13 (Sólo nido sin tortuga - picado) (migración 0015).
+3. **Varamientos como tabla propia**: decisión tomada — se mantienen como están (valores 9/10 de `accion_codigo` dentro de `fichas`), sin tabla propia por ahora.
+4. **Campos de clasificación de nidada ausentes**: resuelto — se agregaron `protegido` y `compl_div_jun` a `fichas` (migración 0018), y `pasa` a `fichas_limpieza` (migración 0019).
+5. **Códigos 1/2 (Corral) y 3/4 (Caja)**: sigue sin resolverse. No se agregaron los códigos 2 y 4 a `cat_uso_nido` hasta saber qué los distingue de 1 y 3.
 
 Estas discrepancias quedan documentadas para decidir con el responsable del proyecto antes de tocar más catálogos o la estructura de `fichas`.
