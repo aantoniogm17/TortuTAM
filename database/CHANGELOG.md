@@ -26,3 +26,5 @@
 | 0020 | 2026-09-17 | Siembra `cat_especies` con las 5 especies del protocolo oficial (código de lora: `lk`). |
 | 0021 | 2026-09-17 | Agrega a `fichas` los campos `protegido` y `compl_div_jun` del protocolo oficial. |
 | 0022 | 2026-09-17 | Agrega a `fichas_limpieza` el campo `pasa` del protocolo oficial. |
+| 0023 | 2026-09-23 | Corrige en `cat_especies` el nombre científico de la lora (código `lk`) a `Lepidochelys kempii`. |
+| 0024 | 2026-09-23 | Ajusta `cat_playas` al alcance confirmado con el equipo de campo: `alt`, `tp`, `mir`, `lp`, `bag`, `mez`. |
