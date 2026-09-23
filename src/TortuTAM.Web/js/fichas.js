@@ -122,6 +122,7 @@
 
   var playaFiltroSelect = document.getElementById('q_playa');
   var accionFiltroSelect = document.getElementById('q_accion');
+  var especieFiltroSelect = document.getElementById('q_especie');
 
   function iniciarCatalogos(){
     if(!catalogos){ return Promise.resolve(); }
@@ -133,6 +134,9 @@
       llenarSelectFiltro(accionFiltroSelect, datos.acciones, function(a){
         return { value: a.codigo, label: a.descripcion };
       }, 'Todas las acciones');
+      llenarSelectFiltro(especieFiltroSelect, datos.especies, function(e){
+        return { value: e.codigo, label: e.nombreComun };
+      }, 'Todas las especies');
     }).catch(function(){
       catalogosCache = { playas: [], especies: [], acciones: [], usoNido: [] };
     });
@@ -265,6 +269,9 @@
       pit: val('q_pit') || undefined,
       playaId: val('q_playa') || undefined,
       accionCodigo: val('q_accion') || undefined,
+      fechaDesde: val('q_fecha_desde') || undefined,
+      fechaHasta: val('q_fecha_hasta') || undefined,
+      especieCodigo: val('q_especie') || undefined,
       page: paginaActual,
       pageSize: TAMANO_PAGINA
     };
@@ -289,17 +296,18 @@
 
   var aplicarFiltrosDebounced = debounce(aplicarFiltros, 350);
 
-  ['q_numero', 'q_pit'].forEach(function(id){
+  ['q_numero', 'q_pit', 'q_fecha_desde', 'q_fecha_hasta'].forEach(function(id){
     var el = document.getElementById(id);
     if(el){ el.addEventListener('input', aplicarFiltrosDebounced); }
   });
   if(playaFiltroSelect){ playaFiltroSelect.addEventListener('change', aplicarFiltros); }
   if(accionFiltroSelect){ accionFiltroSelect.addEventListener('change', aplicarFiltros); }
+  if(especieFiltroSelect){ especieFiltroSelect.addEventListener('change', aplicarFiltros); }
 
   var limpiarFiltrosBtn = document.getElementById('q_limpiar');
   if(limpiarFiltrosBtn){
     limpiarFiltrosBtn.addEventListener('click', function(){
-      ['q_numero', 'q_pit', 'q_playa', 'q_accion'].forEach(function(id){
+      ['q_numero', 'q_pit', 'q_playa', 'q_accion', 'q_especie', 'q_fecha_desde', 'q_fecha_hasta'].forEach(function(id){
         var el = document.getElementById(id);
         if(el){ el.value = ''; }
       });
