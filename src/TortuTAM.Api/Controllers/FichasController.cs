@@ -84,6 +84,9 @@ public class FichasController(DominioDbContext dominioDb, IAlmacenamientoFotos a
         [FromQuery] int? playaId,
         [FromQuery] string? pit,
         [FromQuery] byte? accionCodigo,
+        [FromQuery] DateOnly? fechaDesde,
+        [FromQuery] DateOnly? fechaHasta,
+        [FromQuery] string? especieCodigo,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20,
         CancellationToken cancellationToken = default)
@@ -106,6 +109,21 @@ public class FichasController(DominioDbContext dominioDb, IAlmacenamientoFotos a
         if (accionCodigo is not null)
         {
             query = query.Where(f => f.AccionCodigo == accionCodigo);
+        }
+
+        if (fechaDesde is not null)
+        {
+            query = query.Where(f => f.Fecha >= fechaDesde);
+        }
+
+        if (fechaHasta is not null)
+        {
+            query = query.Where(f => f.Fecha <= fechaHasta);
+        }
+
+        if (!string.IsNullOrWhiteSpace(especieCodigo))
+        {
+            query = query.Where(f => f.EspecieCodigo == especieCodigo);
         }
 
         if (!string.IsNullOrWhiteSpace(pit))

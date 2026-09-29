@@ -112,6 +112,18 @@
     return c ? c.descripcion : codigo;
   }
 
+  function llenarSelectFiltro(select, items, mapFn, textoVacio){
+    if(!select) return;
+    var actual = select.value;
+    var opciones = '<option value="">' + escapeHtml(textoVacio) + '</option>';
+    (items || []).forEach(function(item){
+      var mapped = mapFn(item);
+      opciones += '<option value="' + escapeHtml(mapped.value) + '">' + escapeHtml(mapped.label) + '</option>';
+    });
+    select.innerHTML = opciones;
+    select.value = actual;
+  }
+
   function textoSiNo(valor){
     if(valor === 'S'){ return 'Si'; }
     if(valor === 'N'){ return 'No'; }
@@ -126,6 +138,12 @@
     ]).then(function(resultados){
       catalogosCache = resultados[0] || catalogosCache;
       categoriasConteoCache = resultados[1] || [];
+      llenarSelectFiltro(playaFiltroSelect, catalogosCache.playas, function(p){
+        return { value: p.id, label: p.codigo + ' - ' + p.nombre };
+      }, 'Todas las playas');
+      llenarSelectFiltro(especieFiltroSelect, catalogosCache.especies, function(e){
+        return { value: e.codigo, label: e.nombreComun };
+      }, 'Todas las especies');
     }).catch(function(){
       catalogosCache = { playas: [], especies: [], acciones: [], usoNido: [] };
       categoriasConteoCache = [];
@@ -133,6 +151,9 @@
   }
 
   /* ---------------- Tabla ---------------- */
+
+  var playaFiltroSelect = document.getElementById('lq_playa');
+  var especieFiltroSelect = document.getElementById('lq_especie');
 
   var tablaScroll = document.getElementById('lq_tableScroll');
   var emptyState = document.getElementById('lq_emptyState');
@@ -233,6 +254,10 @@
       numeroFicha: val('lq_numero') || undefined,
       corral: val('lq_corral') || undefined,
       nido: val('lq_nido') || undefined,
+      playaId: val('lq_playa') || undefined,
+      fechaDesde: val('lq_fecha_desde') || undefined,
+      fechaHasta: val('lq_fecha_hasta') || undefined,
+      especieCodigo: val('lq_especie') || undefined,
       page: paginaActual,
       pageSize: TAMANO_PAGINA
     };
@@ -257,15 +282,17 @@
 
   var aplicarFiltrosDebounced = debounce(aplicarFiltros, 350);
 
-  ['lq_numero', 'lq_corral', 'lq_nido'].forEach(function(id){
+  ['lq_numero', 'lq_corral', 'lq_nido', 'lq_fecha_desde', 'lq_fecha_hasta'].forEach(function(id){
     var el = document.getElementById(id);
     if(el){ el.addEventListener('input', aplicarFiltrosDebounced); }
   });
+  if(playaFiltroSelect){ playaFiltroSelect.addEventListener('change', aplicarFiltros); }
+  if(especieFiltroSelect){ especieFiltroSelect.addEventListener('change', aplicarFiltros); }
 
   var limpiarFiltrosBtn = document.getElementById('lq_limpiar');
   if(limpiarFiltrosBtn){
     limpiarFiltrosBtn.addEventListener('click', function(){
-      ['lq_numero', 'lq_corral', 'lq_nido'].forEach(function(id){
+      ['lq_numero', 'lq_corral', 'lq_nido', 'lq_playa', 'lq_especie', 'lq_fecha_desde', 'lq_fecha_hasta'].forEach(function(id){
         var el = document.getElementById(id);
         if(el){ el.value = ''; }
       });

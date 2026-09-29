@@ -55,6 +55,10 @@ public class LimpiezasController(DominioDbContext dominioDb) : ControllerBase
         [FromQuery] string? numeroFicha,
         [FromQuery] string? corral,
         [FromQuery] string? nido,
+        [FromQuery] int? playaId,
+        [FromQuery] DateOnly? fechaDesde,
+        [FromQuery] DateOnly? fechaHasta,
+        [FromQuery] string? especieCodigo,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20,
         CancellationToken cancellationToken = default)
@@ -77,6 +81,26 @@ public class LimpiezasController(DominioDbContext dominioDb) : ControllerBase
         if (!string.IsNullOrWhiteSpace(nido))
         {
             query = query.Where(f => f.Nido == nido);
+        }
+
+        if (playaId is not null)
+        {
+            query = query.Where(f => f.PlayaId == playaId);
+        }
+
+        if (fechaDesde is not null)
+        {
+            query = query.Where(f => f.FechaLimpieza >= fechaDesde);
+        }
+
+        if (fechaHasta is not null)
+        {
+            query = query.Where(f => f.FechaLimpieza <= fechaHasta);
+        }
+
+        if (!string.IsNullOrWhiteSpace(especieCodigo))
+        {
+            query = query.Where(f => f.EspecieCodigo == especieCodigo);
         }
 
         var total = await query.CountAsync(cancellationToken);
