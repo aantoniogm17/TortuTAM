@@ -32,7 +32,7 @@ El propio protocolo indica que esta lista se debe completar por proyecto ("DEFIN
 
 | Código oficial | Especie |
 |---|---|
-| lk | Lora (*Lepidochelys olivacea*) |
+| lk | Lora (*Lepidochelys kempii*) |
 | cm | Verde (*Chelonia mydas*) |
 | cc | Caguama (*Caretta caretta*) |
 | dc | Laúd (*Dermochelys coriacea*) |
