@@ -42,6 +42,7 @@ Autenticación vía ASP.NET Core Identity. El inicio de sesión requiere conexi�
 - **Modelo C# de las columnas nuevas**: `fichas.protegido`, `fichas.compl_div_jun` y `fichas_limpieza.pasa` (migraciones 0021-0022) todavía no están reflejadas en `Models/Dominio/Ficha.cs` / `FichaLimpieza.cs`, ni en los contratos/controladores del backend. Falta ese trabajo para que la API las exponga.
 - **Modificaciones a la base de datos**: hay cambios pendientes según información y requerimientos ya recibidos del cliente, todavía no consolidados. Se irán resolviendo por issue.
 - **Relación `fichas_limpieza` ↔ `fichas`**: existen dos caminos (la llave foránea `ficha_anidacion_id` y el emparejamiento por corral+nido usado en `vw_estatus_nidos`); falta decidir si se deja solo la FK como fuente de verdad.
+- **Revisar cuentas de acceso creadas**: para pruebas locales se creó una cuenta Administrador (`admin.demo@tortutam.local`) desde el Superadmin semilla. Falta decidir una política real de alta de cuentas (quién las crea, cómo se entregan credenciales) antes de que el proyecto tenga un ambiente real; las cuentas de prueba locales no deben confundirse con cuentas de producción.
 
 ## Decisiones ya tomadas a partir del protocolo oficial
 
