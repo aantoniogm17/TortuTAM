@@ -25,7 +25,7 @@
   deploy real, a partir del commit, para no depender de que alguien la suba
   a mano.
 */
-var CACHE_VERSION = 'v1';
+var CACHE_VERSION = 'v2';
 var CACHE_NAME = 'tortutam-shell-' + CACHE_VERSION;
 
 var APP_SHELL = [
@@ -47,6 +47,9 @@ var APP_SHELL = [
   'js/limpieza-nueva.js',
   'js/limpiezas.js',
   'js/panel.js',
+  'js/reportes.js',
+  'vendor/jspdf.umd.min.js',
+  'vendor/jspdf.plugin.autotable.min.js',
   'js/mapa-nidos.js',
   'js/nav.js',
   'js/pwa.js'
