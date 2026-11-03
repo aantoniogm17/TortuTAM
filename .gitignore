@@ -4,6 +4,7 @@ obj/
 *.user
 .vs/
 *.suo
+publish/
 
 # Secretos y configuración local
 appsettings.Development.json
