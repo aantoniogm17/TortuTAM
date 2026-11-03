@@ -15,7 +15,7 @@ TortuTAM digitaliza la captura de datos del Programa Binacional para la Recupera
 | Offline | Captura sin conexión con sincronización posterior al recuperar señal |
 | GPS | Obligatorio en cada toma de datos |
 | Imágenes | La app debe permitir adjuntar fotos a la ficha |
-| Hosting | Sin definir; probable AWS a futuro. Sin servidor, dominio ni presupuesto asignado todavía |
+| Hosting | Sin definir; probable AWS a futuro. Sin servidor, dominio ni presupuesto asignado todavía. Ver `docs/auditoria-produccion.md` para el detalle de qué falta antes de desplegar |
 | Idioma | Español únicamente por ahora; inglés queda para una fase futura |
 | Exportación de datos | A futuro, sin especificar formato aún |
 | Cronograma | No definido todavía |
