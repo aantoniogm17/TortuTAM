@@ -1,0 +1,58 @@
+name: Deploy a Hostinger VPS
+
+# Disparo manual a proposito (workflow_dispatch), no automatico en cada push
+# a main. Activarlo como "on: push" solo cuando el VPS exista de verdad y
+# los secretos de abajo esten configurados en Settings > Secrets del repo.
+#
+# Secretos requeridos:
+#   VPS_HOST       IP o dominio del VPS
+#   VPS_USER       usuario SSH de despliegue (no root)
+#   VPS_SSH_KEY    llave privada SSH (formato PEM) de ese usuario
+#   VPS_API_PATH   ruta absoluta donde vive la API publicada (ej. /opt/tortutam/api)
+#   VPS_WEB_PATH   ruta absoluta donde vive el frontend estatico (ej. /opt/tortutam/web)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar .NET 10 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Publicar backend
+        working-directory: src/TortuTAM.Api
+        run: dotnet publish --configuration Release --output ../../publish/api
+
+      - name: Estampar CACHE_VERSION del service worker con el commit
+        run: |
+          SHA_CORTO="${GITHUB_SHA::7}"
+          sed -i "s/CACHE_VERSION = '.*'/CACHE_VERSION = '${SHA_CORTO}'/" src/TortuTAM.Web/sw.js
+          echo "CACHE_VERSION estampada en ${SHA_CORTO}"
+
+      - name: Configurar llave SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Copiar backend al VPS
+        run: |
+          rsync -az --delete -e "ssh -i ~/.ssh/deploy_key" \
+            publish/api/ "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.VPS_API_PATH }}/"
+
+      - name: Copiar frontend al VPS
+        run: |
+          rsync -az --delete -e "ssh -i ~/.ssh/deploy_key" \
+            src/TortuTAM.Web/ "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.VPS_WEB_PATH }}/"
+
+      - name: Reiniciar el servicio de la API
+        run: |
+          ssh -i ~/.ssh/deploy_key "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" \
+            "sudo systemctl restart tortutam-api"

@@ -1,0 +1,32 @@
+# Unidad de systemd para correr TortuTAM.Api como servicio en el VPS.
+#
+# Instalación en el servidor:
+#   sudo cp deploy/tortutam-api.service /etc/systemd/system/tortutam-api.service
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now tortutam-api
+#
+# Requiere que ya exista /etc/tortutam/api.env con los valores reales
+# (ver deploy/api.env.example) y que la API ya esté publicada en
+# /opt/tortutam/api (ver docs/despliegue-hostinger.md).
+#
+# Logs: journalctl -u tortutam-api -f
+
+[Unit]
+Description=TortuTAM API (ASP.NET Core)
+After=network.target mssql-server.service
+
+[Service]
+Type=notify
+WorkingDirectory=/opt/tortutam/api
+ExecStart=/usr/bin/dotnet /opt/tortutam/api/TortuTAM.Api.dll
+EnvironmentFile=/etc/tortutam/api.env
+Restart=always
+RestartSec=5
+# Usuario propio, sin privilegios de root, dueño de /opt/tortutam y de la
+# ruta de fotos configurada en Storage__FichasFotosPath.
+User=tortutam
+Group=tortutam
+SyslogIdentifier=tortutam-api
+
+[Install]
+WantedBy=multi-user.target
