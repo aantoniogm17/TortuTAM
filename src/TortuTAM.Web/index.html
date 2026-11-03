@@ -203,6 +203,52 @@
           <div id="panelRecentList"></div>
         </div>
       </div>
+
+      <div class="card reporte-card">
+        <h3>Generar reporte</h3>
+        <form id="reporteForm" novalidate>
+          <div class="field-grid">
+            <div class="field">
+              <label for="rep_playa">Playa</label>
+              <select id="rep_playa" name="rep_playa">
+                <option value="">Todas las playas (reporte completo)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="rep_fecha">Fecha de corte</label>
+              <input type="date" id="rep_fecha" name="rep_fecha" required>
+            </div>
+            <div class="field">
+              <label for="rep_formato">Formato</label>
+              <select id="rep_formato" name="rep_formato">
+                <option value="texto">Texto</option>
+                <option value="pdf">PDF</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="status-banner" id="rep_status" role="status" aria-live="polite"></div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn" id="rep_generar">Generar</button>
+          </div>
+        </form>
+
+        <div class="reporte-preview" id="rep_preview" hidden>
+          <pre class="reporte-texto" id="rep_texto" tabindex="0" aria-label="Vista previa del reporte"></pre>
+          <div class="table-scroll" id="rep_tabla" hidden></div>
+        </div>
+
+        <div class="reporte-acciones" id="rep_acciones" hidden>
+          <div id="rep_accionesTexto">
+            <button type="button" class="btn ghost" id="rep_copiar">Copiar</button>
+            <button type="button" class="btn ghost" id="rep_compartir" hidden>Compartir</button>
+          </div>
+          <div id="rep_accionesPdf" hidden>
+            <button type="button" class="btn" id="rep_descargar">Descargar PDF</button>
+          </div>
+        </div>
+      </div>
     </section>
 
     <section class="view" id="view-nueva" data-view="nueva" aria-labelledby="heading-nueva">
@@ -914,6 +960,7 @@
 <script src="js/limpieza-nueva.js" defer></script>
 <script src="js/limpiezas.js" defer></script>
 <script src="js/panel.js" defer></script>
+<script src="js/reportes.js" defer></script>
 <script src="js/mapa-nidos.js" defer></script>
 <script src="js/nav.js" defer></script>
 <script src="js/pwa.js" defer></script>

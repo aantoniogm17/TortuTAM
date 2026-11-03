@@ -70,6 +70,7 @@ builder.Services.AddOptions<StorageOptions>()
 builder.Services.AddSingleton<IAlmacenamientoFotos, AlmacenamientoFotosLocal>();
 
 builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
+builder.Services.AddScoped<IReporteCorteService, ReporteCorteService>();
 
 var jwtSection = builder.Configuration.GetSection(JwtOptions.SectionName);
 var signingKey = jwtSection["SigningKey"];

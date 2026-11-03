@@ -81,6 +81,33 @@
 .recent-item:last-child{border-bottom:none;}
 .recent-item .meta{color:var(--ink-soft); font-size:12px; text-align:right; flex-shrink:0;}
 
+/* ---------- Generador de reportes ---------- */
+.reporte-card{margin-top:16px;}
+.reporte-preview{margin-top:16px;}
+.reporte-texto{
+  margin:0;
+  padding:14px 16px;
+  background:var(--sand);
+  border:1px solid var(--line);
+  border-radius:var(--radius-card);
+  font-family:ui-monospace,Menlo,Consolas,monospace;
+  font-size:13px;
+  line-height:1.55;
+  color:var(--ink);
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  max-height:480px;
+  overflow:auto;
+}
+.reporte-acciones{margin-top:14px;}
+.reporte-acciones > div{display:flex; flex-wrap:wrap; gap:10px;}
+.reporte-acciones .btn{flex:1 1 140px;}
+.reporte-preview td,
+.reporte-preview th[scope="row"]{white-space:nowrap; font-variant-numeric:tabular-nums;}
+.reporte-preview td{text-align:right;}
+.reporte-total th,
+.reporte-total td{font-weight:700; background:var(--sand);}
+
 /* ---------- Responsive ---------- */
 @media (max-width:980px){
   .stat-grid{grid-template-columns:repeat(2,1fr);}

@@ -139,6 +139,10 @@
       return request('/panel/estadisticas' + buildQueryString({ limite: limite }));
     },
 
+    obtenerReporteCorte: function(fecha, playaId){
+      return request('/reportes/corte' + buildQueryString({ fecha: fecha, playaId: playaId }));
+    },
+
     obtenerNidosMapa: function(){
       return request('/nidos/mapa');
     }
