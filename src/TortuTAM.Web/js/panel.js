@@ -145,7 +145,7 @@
 
   function nombrePlaya(id){
     var p = buscarEnCatalogo(catalogosCache.playas, id, 'id');
-    if(p){ return p.codigo + ' - ' + p.nombre; }
+    if(p){ return p.nombre; }
     return (id !== null && id !== undefined && id !== '') ? String(id) : '—';
   }
 

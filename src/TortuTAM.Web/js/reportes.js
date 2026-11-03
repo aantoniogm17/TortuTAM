@@ -134,7 +134,7 @@
 
   function bloquePlaya(p, fecha){
     var l = [];
-    var titulo = (p.codigo ? p.codigo + ' - ' : '') + (p.nombre || '');
+    var titulo = p.nombre || '';
     l.push('Playa ' + titulo);
     l.push('Corte al día ' + fechaCorta(fecha));
     l.push('');
@@ -397,7 +397,7 @@
     catalogos.getPlayas().then(function(playas){
       var html = '<option value="">Todas las playas (reporte completo)</option>';
       (playas || []).forEach(function(p){
-        html += '<option value="' + escapeHtml(p.id) + '">' + escapeHtml(p.codigo + ' - ' + p.nombre) + '</option>';
+        html += '<option value="' + escapeHtml(p.id) + '">' + escapeHtml(p.nombre || '') + '</option>';
       });
       elPlaya.innerHTML = html;
     }).catch(function(){
