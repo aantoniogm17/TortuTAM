@@ -91,7 +91,7 @@
 
   function nombrePlaya(id){
     var p = buscarEnCatalogo(catalogosCache.playas, id, 'id');
-    if(p){ return p.codigo + ' - ' + p.nombre; }
+    if(p){ return p.nombre; }
     return (id !== null && id !== undefined && id !== '') ? String(id) : '—';
   }
 
@@ -139,7 +139,7 @@
       catalogosCache = resultados[0] || catalogosCache;
       categoriasConteoCache = resultados[1] || [];
       llenarSelectFiltro(playaFiltroSelect, catalogosCache.playas, function(p){
-        return { value: p.id, label: p.codigo + ' - ' + p.nombre };
+        return { value: p.id, label: p.nombre };
       }, 'Todas las playas');
       llenarSelectFiltro(especieFiltroSelect, catalogosCache.especies, function(e){
         return { value: e.codigo, label: e.nombreComun };

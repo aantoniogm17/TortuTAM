@@ -82,11 +82,11 @@
       return;
     }
     llenarSelect(document.getElementById('f_playa'), catalogos.getPlayas(), function(p){
-      return { value: p.id, label: p.codigo + ' - ' + p.nombre };
+      return { value: p.id, label: p.nombre };
     }, 'Selecciona una playa');
 
     llenarSelect(document.getElementById('f_especie'), catalogos.getEspecies(), function(e){
-      return { value: e.codigo, label: e.nombreComun + ' (' + e.nombreCientifico + ')' };
+      return { value: e.codigo, label: e.nombreComun };
     }, 'Selecciona una especie');
 
     llenarSelect(document.getElementById('f_accion'), catalogos.getAcciones(), function(a){
