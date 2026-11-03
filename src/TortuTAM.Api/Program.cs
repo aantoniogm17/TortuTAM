@@ -19,11 +19,19 @@ if (string.IsNullOrWhiteSpace(connectionString))
         "Falta configurar ConnectionStrings:DefaultConnection (appsettings, user-secrets o variable de entorno).");
 }
 
+// EnableRetryOnFailure: absorbe cortes momentaneos de conexion a SQL Server
+// (mas probables en un VPS compartiendo recursos con la propia base de
+// datos) reintentando unas cuantas veces antes de fallar, en vez de que
+// cualquier bache de red se convierta de inmediato en un 500 para el
+// cliente. Ver docs/auditoria-produccion.md.
+static void ConfigurarSqlServerConReintentos(Microsoft.EntityFrameworkCore.Infrastructure.SqlServerDbContextOptionsBuilder sqlOptions) =>
+    sqlOptions.EnableRetryOnFailure(maxRetryCount: 5, maxRetryDelay: TimeSpan.FromSeconds(10), errorNumbersToAdd: null);
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(connectionString, ConfigurarSqlServerConReintentos));
 
 builder.Services.AddDbContext<DominioDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(connectionString, ConfigurarSqlServerConReintentos));
 
 builder.Services
     .AddIdentityCore<ApplicationUser>(options =>
