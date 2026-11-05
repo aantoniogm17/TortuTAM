@@ -28,3 +28,9 @@
 | 0022 | 2026-09-17 | Agrega a `fichas_limpieza` el campo `pasa` del protocolo oficial. |
 | 0023 | 2026-09-23 | Corrige en `cat_especies` el nombre científico de la lora (código `lk`) a `Lepidochelys kempii`. |
 | 0024 | 2026-09-23 | Ajusta `cat_playas` al alcance confirmado con el equipo de campo: `alt`, `tp`, `mir`, `lp`, `bag`, `mez`. |
+| 0025 | 2026-10-27 | Agrega a `cat_especies` la golfina (`lo`, *Lepidochelys olivacea*) y "No identificada" (`ni`). |
+| 0026 | 2026-10-27 | Crea `varamientos` (ficha de varamiento NOAA). |
+| 0027 | 2026-10-27 | Trigger de `actualizado_en` en `varamientos`. |
+| 0028 | 2026-10-27 | Crea `varamiento_etiquetas`, `varamiento_hallazgos` y `varamiento_fotos`. |
+| 0029 | 2026-10-27 | Crea `necropsias` (relación 1 a 0/1 con `varamientos`). |
+| 0030 | 2026-10-27 | Trigger de `actualizado_en` en `necropsias`. |

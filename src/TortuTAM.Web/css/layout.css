@@ -110,8 +110,12 @@
   }
   .brand{flex-shrink:0;}
   .brand-text .sub{display:none;}
+  .sidebar{flex-wrap:wrap; row-gap:10px;}
+  /* El menú va en su propio renglón: entre la marca y el indicador de
+     sincronización no le queda ancho en pantallas de teléfono. */
   .primary-nav{
-    flex:1;
+    order:3;
+    flex:1 1 100%;
     min-width:0;
     flex-direction:row;
     gap:4px;

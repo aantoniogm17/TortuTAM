@@ -37,6 +37,11 @@ img,svg{max-width:100%;}
 }
 .skip-link:focus{left:0;}
 
+/* El atributo hidden siempre gana sobre cualquier display de una clase
+   (.field, .chip-set, .cond-block, etc.); sin esta regla, un elemento con
+   hidden y una clase con display:flex seguiria visible. */
+[hidden]{display:none !important;}
+
 .sr-only{
   position:absolute;
   width:1px; height:1px;

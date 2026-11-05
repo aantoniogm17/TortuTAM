@@ -18,6 +18,7 @@
 <link rel="stylesheet" href="css/listado.css">
 <link rel="stylesheet" href="css/panel.css">
 <link rel="stylesheet" href="css/mapa.css">
+<link rel="stylesheet" href="css/registros-campo.css">
 <link rel="stylesheet" href="css/auth.css">
 </head>
 <body>
@@ -150,15 +151,23 @@
       </button>
       <button type="button" class="nav-item" data-view="nueva">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
-        Nueva ficha
+        Anidación
+      </button>
+      <button type="button" class="nav-item" data-view="limpieza">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg>
+        Limpieza
+      </button>
+      <button type="button" class="nav-item" data-view="varamientos">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 19c2 0 2-1.5 4-1.5s2 1.5 4 1.5 2-1.5 4-1.5 2 1.5 4 1.5 2-1.5 4-1.5"/><ellipse cx="12" cy="11" rx="5" ry="3.6"/><path d="M17 10.5l2.5-1M7 10.5L4.5 9.5M9 14l-1.5 1.8M15 14l1.5 1.8"/></svg>
+        Varamientos
+      </button>
+      <button type="button" class="nav-item" data-view="necropsia">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="1"/><path d="M9 4V3h6v1M9 10h6M9 14h6M9 18h3"/></svg>
+        Necropsia
       </button>
       <button type="button" class="nav-item" data-view="fichas">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
         Fichas
-      </button>
-      <button type="button" class="nav-item" data-view="limpieza">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg>
-        Limpieza de nido
       </button>
       <button type="button" class="nav-item" data-view="mapa">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 20l-6-3V4l6 3 6-3 6 3v13l-6-3-6 3z"/><path d="M9 4v13M15 7v13"/></svg>
@@ -253,7 +262,7 @@
 
     <section class="view" id="view-nueva" data-view="nueva" aria-labelledby="heading-nueva">
       <div class="view-header">
-        <h1 id="heading-nueva">Nueva ficha</h1>
+        <h1 id="heading-nueva">Anidación</h1>
         <p class="view-subtitle">Ficha de anidacion. Los campos marcados con * son obligatorios.</p>
       </div>
 
@@ -631,7 +640,7 @@
 
     <section class="view" id="view-limpieza" data-view="limpieza" aria-labelledby="heading-limpieza">
       <div class="view-header">
-        <h1 id="heading-limpieza">Limpieza de nido</h1>
+        <h1 id="heading-limpieza">Limpieza</h1>
         <p class="view-subtitle">Exhumacion y exito de eclosion. Los campos marcados con * son obligatorios.</p>
       </div>
 
@@ -884,6 +893,598 @@
       </div>
     </section>
 
+    <section class="view" id="view-varamientos" data-view="varamientos" aria-labelledby="heading-varamientos">
+      <div class="view-header">
+        <h1 id="heading-varamientos">Varamientos</h1>
+        <p class="view-subtitle">Informe de varamiento de tortuga marina. Los campos marcados con * son obligatorios.</p>
+      </div>
+
+      <div class="subview-tabs" role="tablist" aria-label="Subvistas de varamientos">
+        <button type="button" class="btn small" id="tabVaramientoNuevo" role="tab" aria-selected="true" aria-controls="sub-varamiento-nuevo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          Nuevo varamiento
+        </button>
+        <button type="button" class="btn ghost small" id="tabVaramientoLista" role="tab" aria-selected="false" aria-controls="sub-varamiento-lista" tabindex="-1">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+          Ver registros
+        </button>
+      </div>
+
+      <div id="sub-varamiento-nuevo" role="tabpanel" aria-labelledby="tabVaramientoNuevo">
+        <form id="varamientoForm" class="registro-form" novalidate>
+
+          <div class="form-section">
+            <h3>Información del observador</h3>
+            <div class="field-grid cols-2">
+              <div class="field">
+                <label for="v_observador">Nombre *</label>
+                <input type="text" id="v_observador" name="v_observador" required autocomplete="name" maxlength="120" aria-describedby="err_v_observador">
+                <span class="field-error" id="err_v_observador"></span>
+              </div>
+              <div class="field">
+                <label for="v_playa">Campamento</label>
+                <select id="v_playa" name="v_playa">
+                  <option value="">Cargando...</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Fecha de varamiento</h3>
+            <div class="field-grid cols-2">
+              <div class="field">
+                <label for="v_fecha">Fecha de varamiento *</label>
+                <input type="date" id="v_fecha" name="v_fecha" required aria-describedby="err_v_fecha">
+                <span class="field-error" id="err_v_fecha"></span>
+              </div>
+              <div class="field">
+                <label for="v_numero_dia">Número de tortuga del día *</label>
+                <input type="number" min="1" max="999" step="1" inputmode="numeric" id="v_numero_dia" name="v_numero_dia" required placeholder="001" aria-describedby="err_v_numero_dia v_numero_diaHint">
+                <span class="field-error" id="err_v_numero_dia"></span>
+                <span class="hint" id="v_numero_diaHint">Consecutivo del día en el campamento (1 a 999). No se repite para la misma fecha y campamento.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Ubicación de varamiento</h3>
+            <div class="locate-row">
+              <div class="field">
+                <label for="v_lat">Latitud *</label>
+                <input type="number" step="0.000001" inputmode="decimal" id="v_lat" name="v_lat" placeholder="22.2553" required aria-describedby="err_v_lat">
+                <span class="field-error" id="err_v_lat"></span>
+              </div>
+              <div class="field">
+                <label for="v_lng">Longitud *</label>
+                <input type="number" step="0.000001" inputmode="decimal" id="v_lng" name="v_lng" placeholder="-97.8611" required aria-describedby="err_v_lng">
+                <span class="field-error" id="err_v_lng"></span>
+              </div>
+              <button type="button" class="btn ghost" id="v_locateBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+                Usar mi ubicación
+              </button>
+            </div>
+            <p class="geo-status" id="v_geoStatus">Toca el botón parado junto a la tortuga, o captura las coordenadas manualmente.</p>
+            <div class="field">
+              <label for="v_descripcion_ubicacion">Descripción de ubicación</label>
+              <textarea id="v_descripcion_ubicacion" name="v_descripcion_ubicacion" maxlength="500" placeholder="Referencias del sitio, estaca más cercana, acceso..."></textarea>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Especie</h3>
+            <fieldset class="field" id="v_especie" aria-describedby="err_v_especie v_especieHint">
+              <legend>Especie (selecciona una) *</legend>
+              <div class="chip-set" id="v_especieOpciones">
+                <span class="hint">Cargando especies...</span>
+              </div>
+              <span class="field-error" id="err_v_especie"></span>
+              <span class="hint" id="v_especieHint">Marca <em>No identificada</em> si no reconoces con seguridad la especie. No adivines.</span>
+            </fieldset>
+          </div>
+
+          <div class="form-section">
+            <h3>Condición</h3>
+            <fieldset class="field" id="v_condicion" aria-describedby="err_v_condicion">
+              <legend>Condición (selecciona una) *</legend>
+              <div class="chip-set" data-opciones="condicion" data-name="v_condicion_codigo" data-tipo="radio"></div>
+              <span class="field-error" id="err_v_condicion"></span>
+            </fieldset>
+            <fieldset class="field">
+              <legend>Condición física (selecciona todas las que apliquen)</legend>
+              <div class="chip-set" data-opciones="condicionFisica" data-name="v_condicion_fisica" data-tipo="checkbox"></div>
+            </fieldset>
+          </div>
+
+          <div class="form-section">
+            <h3>Fotografías, boca y necropsia</h3>
+            <fieldset class="field">
+              <legend>Fotografías tomadas (selecciona todas las que apliquen)</legend>
+              <div class="chip-set">
+                <label class="chip"><input type="checkbox" id="v_foto_dorsal"><span>Lado dorsal completo</span></label>
+                <label class="chip"><input type="checkbox" id="v_foto_ventral"><span>Lado ventral completo</span></label>
+                <label class="chip"><input type="checkbox" id="v_foto_heridas"><span>Cualquier herida o anormalidades</span></label>
+                <label class="chip"><input type="checkbox" id="v_foto_material"><span>Cualquier material hecho por el hombre</span></label>
+              </div>
+            </fieldset>
+            <div class="pregunta" data-sino="v_boca_revisada"><span class="pregunta-texto">Boca revisada</span></div>
+            <div class="pregunta" data-sino="v_necropsia_completada"><span class="pregunta-texto">Necropsia completada</span></div>
+            <p class="hint cond-block" data-cuando="v_necropsia_completada:S" hidden>Si la respuesta es sí, registra la ficha en el menú Necropsia después de guardar este varamiento.</p>
+          </div>
+
+          <div class="form-section">
+            <h3>Etiquetas</h3>
+            <p class="hint">Si la respuesta es sí, anexa varias fotografías.</p>
+
+            <div class="pregunta" data-sino="v_etiquetas_aleta"><span class="pregunta-texto">¿Etiquetas en aletas encontradas?</span></div>
+            <div class="cond-block" data-cuando="v_etiquetas_aleta:S" hidden>
+              <p class="hint">Verifica las 4 aletas; si se encuentran, anota número de etiqueta y ubicación (máximo 3).</p>
+              <div class="etiqueta-list" id="v_lista_aleta"></div>
+              <button type="button" class="btn ghost small" id="v_agregar_aleta">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                Agregar etiqueta de aleta
+              </button>
+            </div>
+
+            <div class="pregunta" data-sino="v_cicatrices"><span class="pregunta-texto">¿Posibles cicatrices por etiquetas?</span></div>
+            <fieldset class="field cond-block" data-cuando="v_cicatrices:S" hidden>
+              <legend>Indica todas las posibles ubicaciones de cicatrices de etiquetas</legend>
+              <div class="chip-set" data-opciones="cicatricesUbicaciones" data-name="v_cicatrices_ubic" data-tipo="checkbox"></div>
+            </fieldset>
+
+            <div class="pregunta" data-sino="v_pit"><span class="pregunta-texto">¿Escaneo de etiqueta PIT realizado?</span></div>
+            <div class="cond-block" data-cuando="v_pit:S" hidden>
+              <p class="hint">Verifica las 4 aletas. Si encuentras, registra el número de registro/ubicación (máximo 2).</p>
+              <div class="etiqueta-list" id="v_lista_pit"></div>
+              <button type="button" class="btn ghost small" id="v_agregar_pit">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                Agregar PIT
+              </button>
+            </div>
+
+            <div class="pregunta" data-sino="v_etiqueta_viva"><span class="pregunta-texto">¿Etiqueta viva encontrada?</span></div>
+            <div class="field cond-block" data-cuando="v_etiqueta_viva:S" hidden>
+              <label for="v_etiqueta_viva_detalle">Registra el número de escudo y lado</label>
+              <input type="text" id="v_etiqueta_viva_detalle" name="v_etiqueta_viva_detalle" maxlength="200">
+            </div>
+
+            <div class="pregunta" data-sino="v_rastreo"><span class="pregunta-texto">¿Equipo de rastreo encontrado?</span></div>
+          </div>
+
+          <div class="form-section">
+            <h3>Medidas de caparazón</h3>
+            <div class="field-grid cols-2">
+              <fieldset class="field">
+                <legend>Las medidas son</legend>
+                <div class="chip-set" data-opciones="lccTipo" data-name="v_lcc_tipo" data-tipo="radio"></div>
+              </fieldset>
+              <div class="field">
+                <label for="v_lcc">Largo curvo (muesca-punta), cm</label>
+                <input type="number" min="0" step="0.1" inputmode="decimal" id="v_lcc" name="v_lcc" aria-describedby="err_v_lcc">
+                <span class="field-error" id="err_v_lcc"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Medidas de cola</h3>
+            <fieldset class="field" aria-describedby="v_colaHint">
+              <legend>¿Se extendió la cola más allá del caparazón?</legend>
+              <span class="hint" id="v_colaHint">Al menos 5 cm (lora o golfina), 10 cm (caguama, verde o carey) o 15 cm (laúd).</span>
+              <div class="chip-set" data-opciones="colaExtendida" data-name="v_cola" data-tipo="radio"></div>
+            </fieldset>
+            <div class="field-grid cols-2 cond-block" data-cuando="v_cola:si" hidden>
+              <div class="field">
+                <label for="v_cola_m1">Sí, medida (cm)</label>
+                <input type="number" min="0" step="0.1" inputmode="decimal" id="v_cola_m1" name="v_cola_m1" aria-describedby="err_v_cola_m1">
+                <span class="field-error" id="err_v_cola_m1"></span>
+              </div>
+              <div class="field">
+                <label for="v_cola_m2">Sí, segunda medida (cm)</label>
+                <input type="number" min="0" step="0.1" inputmode="decimal" id="v_cola_m2" name="v_cola_m2" aria-describedby="err_v_cola_m2">
+                <span class="field-error" id="err_v_cola_m2"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Material antropogénico</h3>
+            <div class="pregunta" data-sino="v_material"><span class="pregunta-texto">¿Se encontró material hecho por humano en la tortuga? (ej., equipo de pesca, basura, petróleo)</span></div>
+            <div class="cond-block" data-cuando="v_material:S" hidden>
+              <div class="pregunta" data-sino="v_material_fotos"><span class="pregunta-texto">Si la respuesta es sí, ¿se tomaron fotografías?</span></div>
+              <p class="hint">Si hay material hecho por humano, toma fotografías y contesta las siguientes preguntas (selecciona todas las que apliquen).</p>
+              <div class="hallazgo-list" id="v_materiales" data-categoria="material"></div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Heridas</h3>
+            <div class="pregunta" data-sino="v_heridas"><span class="pregunta-texto">¿Se observaron heridas externas evidentes?</span></div>
+            <div class="cond-block" data-cuando="v_heridas:S" hidden>
+              <div class="pregunta" data-sino="v_heridas_fotos"><span class="pregunta-texto">Si la respuesta es sí, ¿se tomaron fotografías?</span></div>
+              <p class="hint">Si las heridas externas son evidentes, toma fotografías y contesta las siguientes preguntas (selecciona todas las que apliquen).</p>
+              <div class="hallazgo-list" id="v_heridas_lista" data-categoria="herida"></div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Enfermedad, epibiontes y sanguijuelas</h3>
+            <div class="pregunta" data-sino="v_enfermedad"><span class="pregunta-texto">¿Se observaron señas de enfermedad o sanguijuelas?</span></div>
+            <div class="cond-block" data-cuando="v_enfermedad:S" hidden>
+              <div class="pregunta" data-sino="v_enfermedad_fotos"><span class="pregunta-texto">Si la respuesta es sí, ¿se tomaron fotografías?</span></div>
+              <p class="hint">Si la enfermedad o las sanguijuelas son evidentes, toma fotografías y contesta las siguientes preguntas.</p>
+              <div class="pregunta" data-sino="v_demacrada"><span class="pregunta-texto">¿Se encontró la tortuga demacrada?</span></div>
+              <div class="pregunta" data-sino="v_epibiontes"><span class="pregunta-texto">¿Se encontró la piel fuertemente cubierta de epibiontes?</span></div>
+              <div class="pregunta" data-sino="v_fibropapiloma"><span class="pregunta-texto">¿Se encontraron tumores tipo fibropapiloma?</span></div>
+              <fieldset class="field cond-block" data-cuando="v_fibropapiloma:S" hidden>
+                <legend>Si la respuesta es sí, ¿cuántos?</legend>
+                <div class="chip-set" data-opciones="fibropapilomaRango" data-name="v_fibro_rango" data-tipo="radio"></div>
+              </fieldset>
+              <div class="pregunta" data-sino="v_lesiones"><span class="pregunta-texto">¿Se encontraron otras lesiones evidentes en la piel?</span></div>
+              <fieldset class="field cond-block" data-cuando="v_lesiones:S" hidden>
+                <legend>Si la respuesta es sí, ¿áreas pequeñas o áreas grandes?</legend>
+                <div class="chip-set" data-opciones="lesionesPielArea" data-name="v_lesiones_area" data-tipo="radio"></div>
+                <span class="hint">Describe las anormalidades de piel en los comentarios adicionales.</span>
+              </fieldset>
+              <div class="pregunta" data-sino="v_sanguijuelas"><span class="pregunta-texto">¿Se encontraron sanguijuelas o huevos de sanguijuelas evidentes?</span></div>
+              <fieldset class="field cond-block" data-cuando="v_sanguijuelas:S" hidden>
+                <legend>Si la respuesta es sí, ¿eran pocas o muchas?</legend>
+                <div class="chip-set" data-opciones="sanguijuelasCantidad" data-name="v_sanguijuelas_cantidad" data-tipo="radio"></div>
+              </fieldset>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Comentarios adicionales</h3>
+            <div class="field">
+              <label for="v_comentarios">Comentarios</label>
+              <textarea id="v_comentarios" name="v_comentarios" placeholder="Notas de campo..."></textarea>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Fotos</h3>
+            <p class="hint">Toma fotos con la cámara del celular o elige varias desde la galería.</p>
+            <div class="photo-picker" id="v_fotoPreview"></div>
+            <label class="btn ghost" for="v_fotos">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+              Agregar fotos
+            </label>
+            <input type="file" id="v_fotos" name="v_fotos" accept="image/*" multiple capture="environment" class="foto-file-input">
+          </div>
+
+          <div class="status-banner" id="v_status" role="status" aria-live="polite"></div>
+
+          <div class="form-actions">
+            <button type="button" class="btn ghost" id="resetVaramientoBtn">Limpiar</button>
+            <button type="submit" class="btn" id="guardarVaramientoBtn">Guardar varamiento</button>
+          </div>
+        </form>
+      </div>
+
+      <div id="sub-varamiento-lista" role="tabpanel" aria-labelledby="tabVaramientoLista" hidden>
+        <div class="status-banner" id="vq_status" role="status" aria-live="polite"></div>
+
+        <div class="table-scroll" id="vq_tableScroll">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Fecha</th>
+                <th scope="col">Núm. del día</th>
+                <th scope="col">Campamento</th>
+                <th scope="col">Especie</th>
+                <th scope="col">Condición</th>
+                <th scope="col">Necropsia</th>
+                <th scope="col"><span class="sr-only">Acciones</span></th>
+              </tr>
+            </thead>
+            <tbody id="vq_tableBody"></tbody>
+          </table>
+        </div>
+
+        <div class="empty-state" id="vq_emptyState" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M2 19c2 0 2-1.5 4-1.5s2 1.5 4 1.5 2-1.5 4-1.5 2 1.5 4 1.5 2-1.5 4-1.5"/><ellipse cx="12" cy="11" rx="5" ry="3.6"/></svg>
+          <p>Aún no hay varamientos registrados.</p>
+        </div>
+
+        <div class="pagination">
+          <button type="button" class="btn ghost" id="vq_prevBtn">Anterior</button>
+          <span class="page-info" id="vq_pageInfo"></span>
+          <button type="button" class="btn ghost" id="vq_nextBtn">Siguiente</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="view-necropsia" data-view="necropsia" aria-labelledby="heading-necropsia">
+      <div class="view-header">
+        <h1 id="heading-necropsia">Necropsia</h1>
+        <p class="view-subtitle">Informe de examen interno de tortuga marina. Se anexa a un varamiento ya registrado. Los campos marcados con * son obligatorios.</p>
+      </div>
+
+      <div class="subview-tabs" role="tablist" aria-label="Subvistas de necropsia">
+        <button type="button" class="btn small" id="tabNecropsiaNueva" role="tab" aria-selected="true" aria-controls="sub-necropsia-nueva">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          Nueva necropsia
+        </button>
+        <button type="button" class="btn ghost small" id="tabNecropsiaLista" role="tab" aria-selected="false" aria-controls="sub-necropsia-lista" tabindex="-1">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+          Ver registros
+        </button>
+      </div>
+
+      <div id="sub-necropsia-nueva" role="tabpanel" aria-labelledby="tabNecropsiaNueva">
+        <form id="necropsiaForm" class="registro-form" novalidate>
+
+          <div class="form-section">
+            <h3>Varamiento</h3>
+            <div class="field">
+              <label for="n_varamiento">Varamiento al que se anexa *</label>
+              <div class="select-row">
+                <select id="n_varamiento" name="n_varamiento" required aria-describedby="err_n_varamiento n_varamientoHint">
+                  <option value="">Cargando...</option>
+                </select>
+                <button type="button" class="btn ghost" id="n_recargarVaramientos">Actualizar lista</button>
+              </div>
+              <span class="field-error" id="err_n_varamiento"></span>
+              <span class="hint" id="n_varamientoHint">Solo aparecen los varamientos sin necropsia y con condición distinta de Vivo.</span>
+            </div>
+            <div class="field-grid cols-2">
+              <div class="field">
+                <label for="n_fecha">Fecha de necropsia</label>
+                <input type="date" id="n_fecha" name="n_fecha">
+              </div>
+              <div class="field">
+                <label for="n_realizo">Realizó</label>
+                <input type="text" id="n_realizo" name="n_realizo" maxlength="120" autocomplete="name">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Grasa corporal</h3>
+            <fieldset class="field">
+              <legend>Grasa corporal (selecciona una)</legend>
+              <div class="chip-set" data-opciones="grasaCorporal" data-name="n_grasa" data-tipo="radio"></div>
+              <span class="hint">Toma foto.</span>
+            </fieldset>
+          </div>
+
+          <div class="form-section">
+            <h3>Celoma</h3>
+            <fieldset class="field">
+              <legend>Celoma (selecciona todas las que apliquen)</legend>
+              <div class="chip-set" data-opciones="celoma" data-name="n_celoma" data-tipo="checkbox"></div>
+            </fieldset>
+            <div class="field">
+              <label for="n_celoma_com">Comentarios</label>
+              <textarea id="n_celoma_com" name="n_celoma_com" maxlength="1000"></textarea>
+            </div>
+            <fieldset class="field">
+              <legend>¿Tumores FP internos?</legend>
+              <div class="chip-set" data-opciones="siNoCbd" data-name="n_tumores" data-tipo="radio"></div>
+            </fieldset>
+            <div class="field cond-block" data-cuando="n_tumores:si" hidden>
+              <label for="n_tumores_ubic">Si la respuesta es sí, lista las ubicaciones</label>
+              <textarea id="n_tumores_ubic" name="n_tumores_ubic" maxlength="500"></textarea>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Corazón y vasos sanguíneos principales</h3>
+            <fieldset class="field">
+              <legend>Corazón y vasos sanguíneos principales (selecciona todas las que apliquen)</legend>
+              <div class="chip-set" data-opciones="corazon" data-name="n_corazon" data-tipo="checkbox"></div>
+            </fieldset>
+            <fieldset class="field">
+              <legend>¿Sangre en cámaras de corazón?</legend>
+              <div class="chip-set" data-opciones="siNoCbd" data-name="n_sangre" data-tipo="radio"></div>
+            </fieldset>
+            <div class="field">
+              <label for="n_corazon_com">Comentarios</label>
+              <textarea id="n_corazon_com" name="n_corazon_com" maxlength="1000"></textarea>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Hígado y vesícula biliar</h3>
+            <fieldset class="field">
+              <legend>Hígado y vesícula biliar (selecciona todas las que apliquen)</legend>
+              <div class="chip-set" data-opciones="higado" data-name="n_higado" data-tipo="checkbox"></div>
+            </fieldset>
+            <div class="field">
+              <label for="n_higado_com">Comentarios</label>
+              <textarea id="n_higado_com" name="n_higado_com" maxlength="1000"></textarea>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Tracto GI</h3>
+            <fieldset class="field">
+              <legend>Tracto GI (selecciona todas las que apliquen)</legend>
+              <div class="chip-set" data-opciones="tractoGi" data-name="n_tracto" data-tipo="checkbox"></div>
+            </fieldset>
+            <div class="pregunta" data-sino="n_boca_examinada"><span class="pregunta-texto">Boca examinada</span></div>
+            <div class="cond-block" data-cuando="n_tracto:anormal" hidden>
+              <fieldset class="field">
+                <legend>Anomalías (selecciona todas las que apliquen)</legend>
+                <div class="chip-set" data-opciones="giAnormalidades" data-name="n_gi_anorm" data-tipo="checkbox"></div>
+              </fieldset>
+              <div class="field">
+                <label for="n_gi_desc">Describe las anomalías (incluir grado / % afectado)</label>
+                <textarea id="n_gi_desc" name="n_gi_desc" maxlength="1000"></textarea>
+              </div>
+            </div>
+            <div class="field">
+              <label for="n_material_antro">¿Hubo algún material antropogénico?</label>
+              <textarea id="n_material_antro" name="n_material_antro" maxlength="1000" aria-describedby="n_material_antroHint"></textarea>
+              <span class="hint" id="n_material_antroHint">Ingresa la cantidad seguida por la ubicación y anota cualquier complicación, por ejemplo, obstrucción.</span>
+            </div>
+            <fieldset class="field">
+              <legend>¿Hay material hecho por humano ingerido?</legend>
+              <div class="chip-set" data-opciones="siNoCbd" data-name="n_mat_ing" data-tipo="radio"></div>
+            </fieldset>
+            <div class="cond-block" data-cuando="n_mat_ing:si" hidden>
+              <div class="field">
+                <label for="n_mat_ing_desc">Describe el material hecho por humano encontrado</label>
+                <textarea id="n_mat_ing_desc" name="n_mat_ing_desc" maxlength="1000"></textarea>
+              </div>
+              <div class="pregunta" data-sino="n_mat_foto"><span class="pregunta-texto">Foto con escala</span></div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Contenido GI</h3>
+            <div class="gi-list">
+              <fieldset class="gi-row">
+                <legend>Boca/esófago</legend>
+                <div class="chip-set" data-opciones="giEstado" data-name="n_gi_boca" data-tipo="radio"></div>
+                <div class="field cond-block" data-cuando="n_gi_boca:contenido" hidden>
+                  <label for="n_gi_boca_desc">Contenido (descripción)</label>
+                  <input type="text" id="n_gi_boca_desc" name="n_gi_boca_desc" maxlength="500">
+                </div>
+              </fieldset>
+              <fieldset class="gi-row">
+                <legend>Estómago</legend>
+                <div class="chip-set" data-opciones="giEstado" data-name="n_gi_estomago" data-tipo="radio"></div>
+                <div class="field cond-block" data-cuando="n_gi_estomago:contenido" hidden>
+                  <label for="n_gi_estomago_desc">Contenido (descripción)</label>
+                  <input type="text" id="n_gi_estomago_desc" name="n_gi_estomago_desc" maxlength="500">
+                </div>
+              </fieldset>
+              <fieldset class="gi-row">
+                <legend>Intestino (primer ½)</legend>
+                <div class="chip-set" data-opciones="giEstado" data-name="n_gi_int1" data-tipo="radio"></div>
+                <div class="field cond-block" data-cuando="n_gi_int1:contenido" hidden>
+                  <label for="n_gi_int1_desc">Contenido (descripción)</label>
+                  <input type="text" id="n_gi_int1_desc" name="n_gi_int1_desc" maxlength="500">
+                </div>
+              </fieldset>
+              <fieldset class="gi-row">
+                <legend>Intestino (última ½)</legend>
+                <div class="chip-set" data-opciones="giEstado" data-name="n_gi_int2" data-tipo="radio"></div>
+                <div class="field cond-block" data-cuando="n_gi_int2:contenido" hidden>
+                  <label for="n_gi_int2_desc">Contenido (descripción)</label>
+                  <input type="text" id="n_gi_int2_desc" name="n_gi_int2_desc" maxlength="500">
+                </div>
+              </fieldset>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Urogenital</h3>
+            <fieldset class="field">
+              <legend>Urogenital (selecciona una)</legend>
+              <div class="chip-set" data-opciones="urogenital" data-name="n_urogenital" data-tipo="radio"></div>
+            </fieldset>
+            <fieldset class="field">
+              <legend>Sexo</legend>
+              <div class="chip-set" data-opciones="sexo" data-name="n_sexo" data-tipo="radio"></div>
+            </fieldset>
+            <div class="cond-block" data-cuando="n_sexo:M" hidden>
+              <fieldset class="field">
+                <legend>Testículos - caracterización</legend>
+                <div class="chip-set" data-opciones="testiculos" data-name="n_testiculos" data-tipo="radio"></div>
+              </fieldset>
+              <fieldset class="field">
+                <legend>Epidídimo - caracterización</legend>
+                <div class="chip-set" data-opciones="epididimo" data-name="n_epididimo" data-tipo="radio"></div>
+              </fieldset>
+            </div>
+            <div class="cond-block" data-cuando="n_sexo:H" hidden>
+              <fieldset class="field">
+                <legend>Ovarios - caracterización</legend>
+                <div class="chip-set" data-opciones="ovarios" data-name="n_ovarios" data-tipo="radio"></div>
+              </fieldset>
+              <fieldset class="field">
+                <legend>Oviducto - caracterización</legend>
+                <div class="chip-set" data-opciones="oviducto" data-name="n_oviducto" data-tipo="radio"></div>
+              </fieldset>
+            </div>
+            <div class="field">
+              <label for="n_uro_com">Comentarios</label>
+              <textarea id="n_uro_com" name="n_uro_com" maxlength="1000"></textarea>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Respiratorio</h3>
+            <fieldset class="field">
+              <legend>Tráquea/bronquios (selecciona todas las que apliquen)</legend>
+              <div class="chip-set" data-opciones="traquea" data-name="n_traquea" data-tipo="checkbox"></div>
+            </fieldset>
+            <fieldset class="field">
+              <legend>Pulmones (selecciona todas las que apliquen)</legend>
+              <div class="chip-set" data-opciones="pulmones" data-name="n_pulmones" data-tipo="checkbox"></div>
+            </fieldset>
+            <div class="field">
+              <label for="n_resp_com">Comentarios</label>
+              <textarea id="n_resp_com" name="n_resp_com" maxlength="1000"></textarea>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Cerebro y espina dorsal</h3>
+            <fieldset class="field">
+              <legend>Cerebro y espina dorsal (selecciona todas las que apliquen)</legend>
+              <div class="chip-set" data-opciones="cerebro" data-name="n_cerebro" data-tipo="checkbox"></div>
+            </fieldset>
+            <div class="field">
+              <label for="n_cerebro_com">Comentarios</label>
+              <textarea id="n_cerebro_com" name="n_cerebro_com" maxlength="1000"></textarea>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Resumen de hallazgos</h3>
+            <div class="field">
+              <label for="n_resumen">Notas adicionales / comentarios</label>
+              <textarea id="n_resumen" name="n_resumen" class="textarea-largo" aria-describedby="n_resumenHint"></textarea>
+              <span class="hint" id="n_resumenHint">Resume tus hallazgos: incluye información sobre cualquier herida, anormalidades mayores obvias, condición nutricional y la exploración de los contenidos digestivos. Por ejemplo: 1. No hay aparentes anormalidades; 2. Abundante grasa; 3. Concha de jaiba en estómago e intestinos.</span>
+            </div>
+          </div>
+
+          <div class="status-banner" id="n_status" role="status" aria-live="polite"></div>
+
+          <div class="form-actions">
+            <button type="button" class="btn ghost" id="resetNecropsiaBtn">Limpiar</button>
+            <button type="submit" class="btn" id="guardarNecropsiaBtn">Guardar necropsia</button>
+          </div>
+        </form>
+      </div>
+
+      <div id="sub-necropsia-lista" role="tabpanel" aria-labelledby="tabNecropsiaLista" hidden>
+        <div class="status-banner" id="nq_status" role="status" aria-live="polite"></div>
+
+        <div class="table-scroll" id="nq_tableScroll">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Fecha necropsia</th>
+                <th scope="col">Varamiento</th>
+                <th scope="col">Campamento</th>
+                <th scope="col">Especie</th>
+                <th scope="col">Sexo</th>
+                <th scope="col"><span class="sr-only">Acciones</span></th>
+              </tr>
+            </thead>
+            <tbody id="nq_tableBody"></tbody>
+          </table>
+        </div>
+
+        <div class="empty-state" id="nq_emptyState" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="1"/><path d="M9 10h6M9 14h6"/></svg>
+          <p>Aún no hay necropsias registradas.</p>
+        </div>
+
+        <div class="pagination">
+          <button type="button" class="btn ghost" id="nq_prevBtn">Anterior</button>
+          <span class="page-info" id="nq_pageInfo"></span>
+          <button type="button" class="btn ghost" id="nq_nextBtn">Siguiente</button>
+        </div>
+      </div>
+    </section>
+
     <section class="view" id="view-mapa" data-view="mapa" aria-labelledby="heading-mapa">
       <div class="view-header">
         <h1 id="heading-mapa">Mapa de nidos</h1>
@@ -950,15 +1551,45 @@
   </div>
 </div>
 
+<div class="overlay" id="varamientoDrawerOverlay" hidden>
+  <div class="drawer" id="varamientoDrawer" role="dialog" aria-modal="true" aria-labelledby="varamientoDrawerTitle" tabindex="-1">
+    <div class="drawer-head">
+      <h2 id="varamientoDrawerTitle">Varamiento</h2>
+      <button type="button" class="close-x" id="varamientoDrawerClose" aria-label="Cerrar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div id="varamientoDrawerBody"></div>
+  </div>
+</div>
+
+<div class="overlay" id="necropsiaDrawerOverlay" hidden>
+  <div class="drawer" id="necropsiaDrawer" role="dialog" aria-modal="true" aria-labelledby="necropsiaDrawerTitle" tabindex="-1">
+    <div class="drawer-head">
+      <h2 id="necropsiaDrawerTitle">Necropsia</h2>
+      <button type="button" class="close-x" id="necropsiaDrawerClose" aria-label="Cerrar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div id="necropsiaDrawerBody"></div>
+  </div>
+</div>
+
 <script src="js/config.local.js" defer></script>
 <script src="js/api.js" defer></script>
 <script src="js/auth.js" defer></script>
 <script src="js/sync-queue.js" defer></script>
 <script src="js/catalogos.js" defer></script>
+<script src="js/form-utils.js" defer></script>
+<script src="js/codigos-campo.js" defer></script>
 <script src="js/ficha-nueva.js" defer></script>
 <script src="js/fichas.js" defer></script>
 <script src="js/limpieza-nueva.js" defer></script>
 <script src="js/limpiezas.js" defer></script>
+<script src="js/varamiento-nuevo.js" defer></script>
+<script src="js/varamientos.js" defer></script>
+<script src="js/necropsia-nueva.js" defer></script>
+<script src="js/necropsias.js" defer></script>
 <script src="js/panel.js" defer></script>
 <script src="js/reportes.js" defer></script>
 <script src="js/mapa-nidos.js" defer></script>

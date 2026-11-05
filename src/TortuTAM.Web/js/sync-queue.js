@@ -9,11 +9,12 @@
   Forma de cada registro guardado en el object store 'cola':
     {
       id: number (autoincrement),
-      tipo: 'ficha' | 'limpieza',
+      tipo: 'ficha' | 'limpieza' | 'varamiento' | 'necropsia',
       payload: object,          // mismo body que se le manda a la API
-      fotos: File[],            // solo aplica a 'ficha'; [] en 'limpieza'
-      idempotencyKey: string|null,  // solo 'ficha'; ver comentario abajo
-      numeroFicha: string,      // solo para mostrar/depurar, no se usa para logica
+      fotos: File[],            // solo 'ficha' y 'varamiento'; [] en los demas
+      idempotencyKey: string|null,  // solo 'ficha' y 'varamiento'; ver comentario abajo
+      numeroFicha: string,      // descripcion para mostrar/depurar, no se usa para logica
+                                // fichaIdServidor guarda tambien el id del varamiento creado
       estado: 'pendiente' | 'fotos_pendientes' | 'atencion',
       fichaIdServidor: number|null, // id que devolvio el servidor una vez creada la ficha
       intentos: number,
@@ -155,17 +156,37 @@
 
   /* ---------------- Encolar ---------------- */
 
+  var TIPOS_VALIDOS = ['ficha', 'limpieza', 'varamiento', 'necropsia'];
+
+  // Tipos cuyo POST acepta Idempotency-Key y que pueden llevar fotos
+  // adjuntas que se suben despues de crear el registro.
+  function usaIdempotenciaYFotos(tipo){
+    return tipo === 'ficha' || tipo === 'varamiento';
+  }
+
+  function descripcionRegistro(tipo, payload){
+    if(!payload){ return ''; }
+    if(tipo === 'varamiento'){
+      return 'Varamiento ' + (payload.fechaVaramiento || '') + ' #' + (payload.numeroTortugaDia || '');
+    }
+    if(tipo === 'necropsia'){
+      return 'Necropsia del varamiento ' + (payload.varamientoId || '');
+    }
+    return payload.numeroFicha || '';
+  }
+
   function encolar(tipo, payload, fotos){
-    if(tipo !== 'ficha' && tipo !== 'limpieza'){
+    if(TIPOS_VALIDOS.indexOf(tipo) === -1){
       return Promise.reject(new Error('Tipo de registro no reconocido: ' + tipo));
     }
     var ahora = new Date().toISOString();
+    var conFotos = usaIdempotenciaYFotos(tipo);
     var registro = {
       tipo: tipo,
       payload: payload,
-      fotos: (tipo === 'ficha' && fotos && fotos.length) ? fotos.slice() : [],
-      idempotencyKey: tipo === 'ficha' ? generarIdempotencyKey() : null,
-      numeroFicha: (payload && payload.numeroFicha) || '',
+      fotos: (conFotos && fotos && fotos.length) ? fotos.slice() : [],
+      idempotencyKey: conFotos ? generarIdempotencyKey() : null,
+      numeroFicha: descripcionRegistro(tipo, payload),
       estado: 'pendiente',
       fichaIdServidor: null,
       intentos: 0,
@@ -186,6 +207,14 @@
   }
 
   function manejarErrorEnvio(registro, err){
+    if(err && err.status === 409 && registro.tipo === 'varamiento'){
+      // En varamientos el reenvio duplicado ya lo resuelve Idempotency-Key;
+      // un 409 significa que otro registro ya ocupa la misma fecha,
+      // campamento y numero de tortuga del dia: requiere revision manual.
+      registro.estado = 'atencion';
+      registro.mensajeError = err.message || 'ya existe un varamiento con la misma fecha, campamento y número del día.';
+      return guardarRegistro(registro).then(function(){ return 'atencion'; });
+    }
     if(err && err.status === 409){
       // numero_ficha ya existe en el servidor: ya se habia sincronizado en
       // un intento anterior cuya respuesta no llego al cliente.
@@ -210,8 +239,11 @@
       return eliminarRegistro(registro.id).then(function(){ return 'sincronizado'; });
     }
     var restantes = [];
+    var subir = registro.tipo === 'varamiento'
+      ? function(id, foto){ return api.subirFotosVaramiento(id, foto); }
+      : function(id, foto){ return api.subirFoto(id, foto); };
     var tareas = registro.fotos.map(function(foto){
-      return api.subirFoto(registro.fichaIdServidor, foto).then(function(){
+      return subir(registro.fichaIdServidor, foto).then(function(){
         return true;
       }).catch(function(){
         restantes.push(foto);
@@ -227,9 +259,10 @@
     });
   }
 
-  function sincronizarFicha(registro){
+  function sincronizarConFotos(registro){
     registro.intentos += 1;
-    return api.crearFicha(registro.payload, { 'Idempotency-Key': registro.idempotencyKey }).then(function(ficha){
+    var crear = registro.tipo === 'varamiento' ? api.crearVaramiento : api.crearFicha;
+    return crear(registro.payload, { 'Idempotency-Key': registro.idempotencyKey }).then(function(ficha){
       var fichaId = ficha && ficha.id;
       if(registro.fotos.length && fichaId){
         registro.fichaIdServidor = fichaId;
@@ -243,9 +276,13 @@
     });
   }
 
-  function sincronizarLimpieza(registro){
+  // Limpieza y necropsia no llevan Idempotency-Key: un 409 al reintentar
+  // significa que ya se habia sincronizado (numero_ficha unico en limpiezas,
+  // varamiento_id unico en necropsias).
+  function sincronizarSinFotos(registro){
     registro.intentos += 1;
-    return api.crearLimpieza(registro.payload).then(function(){
+    var crear = registro.tipo === 'necropsia' ? api.crearNecropsia : api.crearLimpieza;
+    return crear(registro.payload).then(function(){
       return eliminarRegistro(registro.id).then(function(){ return 'sincronizado'; });
     }).catch(function(err){
       return manejarErrorEnvio(registro, err);
@@ -256,7 +293,7 @@
     if(!api){ return Promise.resolve('pendiente'); }
     if(registro.estado === 'atencion'){ return Promise.resolve('atencion'); }
     if(registro.estado === 'fotos_pendientes'){ return subirFotosPendientes(registro); }
-    return registro.tipo === 'ficha' ? sincronizarFicha(registro) : sincronizarLimpieza(registro);
+    return usaIdempotenciaYFotos(registro.tipo) ? sincronizarConFotos(registro) : sincronizarSinFotos(registro);
   }
 
   function intentarSincronizar(){

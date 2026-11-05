@@ -14,21 +14,25 @@ public class AlmacenamientoFotosLocal : IAlmacenamientoFotos
             : Path.Combine(entorno.ContentRootPath, rutaConfigurada);
     }
 
-    public async Task<string> GuardarAsync(int fichaId, IFormFile archivo, CancellationToken cancellationToken)
+    public Task<string> GuardarAsync(int fichaId, IFormFile archivo, CancellationToken cancellationToken) =>
+        GuardarAsync(fichaId.ToString(), archivo, cancellationToken);
+
+    public async Task<string> GuardarAsync(string carpetaRelativa, IFormFile archivo, CancellationToken cancellationToken)
     {
-        var carpetaFicha = Path.Combine(_rutaBase, fichaId.ToString());
-        Directory.CreateDirectory(carpetaFicha);
+        var segmentos = carpetaRelativa.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        var carpeta = Path.Combine([_rutaBase, .. segmentos]);
+        Directory.CreateDirectory(carpeta);
 
         var extension = Path.GetExtension(archivo.FileName);
         var nombreArchivo = $"{Guid.NewGuid():N}{extension}";
-        var rutaFisica = Path.Combine(carpetaFicha, nombreArchivo);
+        var rutaFisica = Path.Combine(carpeta, nombreArchivo);
 
         await using (var destino = File.Create(rutaFisica))
         {
             await archivo.CopyToAsync(destino, cancellationToken);
         }
 
-        return $"{fichaId}/{nombreArchivo}";
+        return $"{string.Join('/', segmentos)}/{nombreArchivo}";
     }
 
     public string ObtenerRutaFisica(string rutaRelativa)

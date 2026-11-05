@@ -25,6 +25,16 @@ public class DominioDbContext(DbContextOptions<DominioDbContext> options) : DbCo
 
     public DbSet<LimpiezaConteo> LimpiezaConteos => Set<LimpiezaConteo>();
 
+    public DbSet<Varamiento> Varamientos => Set<Varamiento>();
+
+    public DbSet<VaramientoEtiqueta> VaramientoEtiquetas => Set<VaramientoEtiqueta>();
+
+    public DbSet<VaramientoHallazgo> VaramientoHallazgos => Set<VaramientoHallazgo>();
+
+    public DbSet<VaramientoFoto> VaramientoFotos => Set<VaramientoFoto>();
+
+    public DbSet<Necropsia> Necropsias => Set<Necropsia>();
+
     public DbSet<VwExitoEclosion> VwExitoEclosion => Set<VwExitoEclosion>();
 
     public DbSet<VwEstatusNido> VwEstatusNidos => Set<VwEstatusNido>();
@@ -210,6 +220,173 @@ public class DominioDbContext(DbContextOptions<DominioDbContext> options) : DbCo
             entity.Property(c => c.AlbinasDeformes).HasColumnName("albinas_deformes");
             entity.Property(c => c.Total).HasColumnName("total");
             entity.HasIndex(c => new { c.FichaLimpiezaId, c.CategoriaCodigo }).IsUnique();
+        });
+
+        builder.Entity<Varamiento>(entity =>
+        {
+            // trg_varamientos_actualizado_en (migración 0027): mismo motivo que
+            // trg_fichas_actualizado_en arriba, se declara para que EF no use OUTPUT en el UPDATE.
+            entity.ToTable("varamientos", tb => tb.HasTrigger("trg_varamientos_actualizado_en"));
+            entity.HasKey(v => v.Id);
+            entity.Property(v => v.Id).HasColumnName("id");
+            entity.Property(v => v.ObservadorNombre).HasColumnName("observador_nombre").HasMaxLength(120).IsRequired();
+            entity.Property(v => v.PlayaId).HasColumnName("playa_id");
+            entity.Property(v => v.Latitud).HasColumnName("latitud").HasColumnType("decimal(9,6)");
+            entity.Property(v => v.Longitud).HasColumnName("longitud").HasColumnType("decimal(9,6)");
+            entity.Property(v => v.DescripcionUbicacion).HasColumnName("descripcion_ubicacion").HasMaxLength(500);
+            entity.Property(v => v.FechaVaramiento).HasColumnName("fecha_varamiento").HasColumnType("date").IsRequired();
+            entity.Property(v => v.NumeroTortugaDia).HasColumnName("numero_tortuga_dia");
+            entity.Property(v => v.EspecieCodigo).HasColumnName("especie_codigo").HasMaxLength(5).IsRequired();
+            entity.Property(v => v.CondicionCodigo).HasColumnName("condicion_codigo").HasMaxLength(20).IsRequired();
+            entity.Property(v => v.CondicionFisica).HasColumnName("condicion_fisica").HasMaxLength(100);
+            entity.Property(v => v.FotoDorsal).HasColumnName("foto_dorsal");
+            entity.Property(v => v.FotoVentral).HasColumnName("foto_ventral");
+            entity.Property(v => v.FotoHeridas).HasColumnName("foto_heridas");
+            entity.Property(v => v.FotoMaterial).HasColumnName("foto_material");
+            entity.Property(v => v.BocaRevisada).HasColumnName("boca_revisada");
+            entity.Property(v => v.NecropsiaCompletada).HasColumnName("necropsia_completada");
+            entity.Property(v => v.EtiquetasAletaEncontradas).HasColumnName("etiquetas_aleta_encontradas");
+            entity.Property(v => v.CicatricesEtiqueta).HasColumnName("cicatrices_etiqueta");
+            entity.Property(v => v.CicatricesUbicaciones).HasColumnName("cicatrices_ubicaciones").HasMaxLength(20);
+            entity.Property(v => v.PitEscaneado).HasColumnName("pit_escaneado");
+            entity.Property(v => v.EtiquetaViva).HasColumnName("etiqueta_viva");
+            entity.Property(v => v.EtiquetaVivaDetalle).HasColumnName("etiqueta_viva_detalle").HasMaxLength(200);
+            entity.Property(v => v.EquipoRastreo).HasColumnName("equipo_rastreo");
+            entity.Property(v => v.LccCm).HasColumnName("lcc_cm").HasColumnType("decimal(5,1)");
+            entity.Property(v => v.LccTipo).HasColumnName("lcc_tipo").HasMaxLength(1);
+            entity.Property(v => v.ColaExtendida).HasColumnName("cola_extendida").HasMaxLength(2);
+            entity.Property(v => v.ColaMedida1Cm).HasColumnName("cola_medida_1_cm").HasColumnType("decimal(5,1)");
+            entity.Property(v => v.ColaMedida2Cm).HasColumnName("cola_medida_2_cm").HasColumnType("decimal(5,1)");
+            entity.Property(v => v.MaterialEncontrado).HasColumnName("material_encontrado");
+            entity.Property(v => v.MaterialFotos).HasColumnName("material_fotos");
+            entity.Property(v => v.CuerdaAlgoUnido).HasColumnName("cuerda_algo_unido");
+            entity.Property(v => v.HeridasEncontradas).HasColumnName("heridas_encontradas");
+            entity.Property(v => v.HeridasFotos).HasColumnName("heridas_fotos");
+            entity.Property(v => v.HeridaEnredamientoAsociada).HasColumnName("herida_enredamiento_asociada");
+            entity.Property(v => v.EnfermedadObservada).HasColumnName("enfermedad_observada");
+            entity.Property(v => v.EnfermedadFotos).HasColumnName("enfermedad_fotos");
+            entity.Property(v => v.Demacrada).HasColumnName("demacrada");
+            entity.Property(v => v.Epibiontes).HasColumnName("epibiontes");
+            entity.Property(v => v.Fibropapiloma).HasColumnName("fibropapiloma");
+            entity.Property(v => v.FibropapilomaRango).HasColumnName("fibropapiloma_rango").HasMaxLength(5);
+            entity.Property(v => v.LesionesPiel).HasColumnName("lesiones_piel");
+            entity.Property(v => v.LesionesPielArea).HasColumnName("lesiones_piel_area").HasMaxLength(10);
+            entity.Property(v => v.Sanguijuelas).HasColumnName("sanguijuelas");
+            entity.Property(v => v.SanguijuelasCantidad).HasColumnName("sanguijuelas_cantidad").HasMaxLength(10);
+            entity.Property(v => v.Comentarios).HasColumnName("comentarios");
+            entity.Property(v => v.IdempotencyKey).HasColumnName("idempotency_key").HasMaxLength(100);
+            entity.HasIndex(v => v.IdempotencyKey).IsUnique().HasFilter("[idempotency_key] IS NOT NULL");
+            entity.HasIndex(v => new { v.FechaVaramiento, v.PlayaId, v.NumeroTortugaDia }).IsUnique();
+            entity.Property(v => v.CreadoEn).HasColumnName("creado_en").ValueGeneratedOnAdd();
+            entity.Property(v => v.ActualizadoEn).HasColumnName("actualizado_en").ValueGeneratedOnAddOrUpdate();
+
+            entity.HasMany(v => v.Etiquetas)
+                .WithOne(e => e.Varamiento)
+                .HasForeignKey(e => e.VaramientoId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasMany(v => v.Hallazgos)
+                .WithOne(h => h.Varamiento)
+                .HasForeignKey(h => h.VaramientoId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(v => v.Necropsia)
+                .WithOne(n => n.Varamiento)
+                .HasForeignKey<Necropsia>(n => n.VaramientoId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<VaramientoEtiqueta>(entity =>
+        {
+            entity.ToTable("varamiento_etiquetas");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.VaramientoId).HasColumnName("varamiento_id");
+            entity.Property(e => e.Tipo).HasColumnName("tipo").HasMaxLength(10).IsRequired();
+            entity.Property(e => e.Numero).HasColumnName("numero").HasMaxLength(50).IsRequired();
+            entity.Property(e => e.Ubicacion).HasColumnName("ubicacion").HasMaxLength(100);
+        });
+
+        builder.Entity<VaramientoHallazgo>(entity =>
+        {
+            entity.ToTable("varamiento_hallazgos");
+            entity.HasKey(h => h.Id);
+            entity.Property(h => h.Id).HasColumnName("id");
+            entity.Property(h => h.VaramientoId).HasColumnName("varamiento_id");
+            entity.Property(h => h.Categoria).HasColumnName("categoria").HasMaxLength(10).IsRequired();
+            entity.Property(h => h.TipoCodigo).HasColumnName("tipo_codigo").HasMaxLength(20).IsRequired();
+            entity.Property(h => h.Ubicaciones).HasColumnName("ubicaciones").HasMaxLength(100);
+            entity.Property(h => h.Detalle).HasColumnName("detalle").HasMaxLength(500);
+            entity.HasIndex(h => new { h.VaramientoId, h.Categoria, h.TipoCodigo }).IsUnique();
+        });
+
+        builder.Entity<VaramientoFoto>(entity =>
+        {
+            entity.ToTable("varamiento_fotos");
+            entity.HasKey(x => x.Id);
+            entity.Property(x => x.Id).HasColumnName("id");
+            entity.Property(x => x.VaramientoId).HasColumnName("varamiento_id");
+            entity.Property(x => x.RutaRelativa).HasColumnName("ruta_relativa").HasMaxLength(260).IsRequired();
+            entity.Property(x => x.CreadoEn).HasColumnName("creado_en").ValueGeneratedOnAdd();
+
+            entity.HasOne<Varamiento>()
+                .WithMany()
+                .HasForeignKey(x => x.VaramientoId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<Necropsia>(entity =>
+        {
+            // trg_necropsias_actualizado_en (migración 0030): mismo motivo que
+            // trg_fichas_actualizado_en arriba, se declara para que EF no use OUTPUT en el UPDATE.
+            entity.ToTable("necropsias", tb => tb.HasTrigger("trg_necropsias_actualizado_en"));
+            entity.HasKey(n => n.Id);
+            entity.Property(n => n.Id).HasColumnName("id");
+            entity.Property(n => n.VaramientoId).HasColumnName("varamiento_id");
+            entity.HasIndex(n => n.VaramientoId).IsUnique();
+            entity.Property(n => n.FechaNecropsia).HasColumnName("fecha_necropsia").HasColumnType("date");
+            entity.Property(n => n.Realizo).HasColumnName("realizo").HasMaxLength(120);
+            entity.Property(n => n.GrasaCorporal).HasColumnName("grasa_corporal").HasMaxLength(10);
+            entity.Property(n => n.Celoma).HasColumnName("celoma").HasMaxLength(100);
+            entity.Property(n => n.CelomaComentarios).HasColumnName("celoma_comentarios").HasMaxLength(1000);
+            entity.Property(n => n.TumoresFp).HasColumnName("tumores_fp").HasMaxLength(3);
+            entity.Property(n => n.TumoresFpUbicaciones).HasColumnName("tumores_fp_ubicaciones").HasMaxLength(500);
+            entity.Property(n => n.Corazon).HasColumnName("corazon").HasMaxLength(100);
+            entity.Property(n => n.SangreCamaras).HasColumnName("sangre_camaras").HasMaxLength(3);
+            entity.Property(n => n.CorazonComentarios).HasColumnName("corazon_comentarios").HasMaxLength(1000);
+            entity.Property(n => n.Higado).HasColumnName("higado").HasMaxLength(100);
+            entity.Property(n => n.HigadoComentarios).HasColumnName("higado_comentarios").HasMaxLength(1000);
+            entity.Property(n => n.TractoGi).HasColumnName("tracto_gi").HasMaxLength(100);
+            entity.Property(n => n.BocaExaminada).HasColumnName("boca_examinada");
+            entity.Property(n => n.GiAnormalidades).HasColumnName("gi_anormalidades").HasMaxLength(20);
+            entity.Property(n => n.GiDescripcion).HasColumnName("gi_descripcion").HasMaxLength(1000);
+            entity.Property(n => n.MaterialAntropogenicoDetalle).HasColumnName("material_antropogenico_detalle").HasMaxLength(1000);
+            entity.Property(n => n.MaterialIngerido).HasColumnName("material_ingerido").HasMaxLength(3);
+            entity.Property(n => n.MaterialIngeridoDescripcion).HasColumnName("material_ingerido_descripcion").HasMaxLength(1000);
+            entity.Property(n => n.MaterialFotoEscala).HasColumnName("material_foto_escala");
+            entity.Property(n => n.GiBocaEsofagoEstado).HasColumnName("gi_boca_esofago_estado").HasMaxLength(10);
+            entity.Property(n => n.GiBocaEsofagoDescripcion).HasColumnName("gi_boca_esofago_descripcion").HasMaxLength(500);
+            entity.Property(n => n.GiEstomagoEstado).HasColumnName("gi_estomago_estado").HasMaxLength(10);
+            entity.Property(n => n.GiEstomagoDescripcion).HasColumnName("gi_estomago_descripcion").HasMaxLength(500);
+            entity.Property(n => n.GiIntestino1Estado).HasColumnName("gi_intestino_1_estado").HasMaxLength(10);
+            entity.Property(n => n.GiIntestino1Descripcion).HasColumnName("gi_intestino_1_descripcion").HasMaxLength(500);
+            entity.Property(n => n.GiIntestino2Estado).HasColumnName("gi_intestino_2_estado").HasMaxLength(10);
+            entity.Property(n => n.GiIntestino2Descripcion).HasColumnName("gi_intestino_2_descripcion").HasMaxLength(500);
+            entity.Property(n => n.Urogenital).HasColumnName("urogenital").HasMaxLength(15);
+            entity.Property(n => n.Sexo).HasColumnName("sexo").HasMaxLength(2);
+            entity.Property(n => n.Testiculos).HasColumnName("testiculos").HasMaxLength(15);
+            entity.Property(n => n.Epididimo).HasColumnName("epididimo").HasMaxLength(15);
+            entity.Property(n => n.Ovarios).HasColumnName("ovarios").HasMaxLength(15);
+            entity.Property(n => n.Oviducto).HasColumnName("oviducto").HasMaxLength(15);
+            entity.Property(n => n.UrogenitalComentarios).HasColumnName("urogenital_comentarios").HasMaxLength(1000);
+            entity.Property(n => n.Traquea).HasColumnName("traquea").HasMaxLength(120);
+            entity.Property(n => n.Pulmones).HasColumnName("pulmones").HasMaxLength(100);
+            entity.Property(n => n.RespiratorioComentarios).HasColumnName("respiratorio_comentarios").HasMaxLength(1000);
+            entity.Property(n => n.Cerebro).HasColumnName("cerebro").HasMaxLength(120);
+            entity.Property(n => n.CerebroComentarios).HasColumnName("cerebro_comentarios").HasMaxLength(1000);
+            entity.Property(n => n.ResumenHallazgos).HasColumnName("resumen_hallazgos");
+            entity.Property(n => n.CreadoEn).HasColumnName("creado_en").ValueGeneratedOnAdd();
+            entity.Property(n => n.ActualizadoEn).HasColumnName("actualizado_en").ValueGeneratedOnAddOrUpdate();
         });
 
         builder.Entity<VwExitoEclosion>(entity =>

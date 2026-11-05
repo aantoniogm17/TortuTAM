@@ -1,0 +1,140 @@
+/*
+  Estilos de los formularios de Varamientos y Necropsia. Extiende el patron
+  de css/forms.css (form-section, field, chip-toggle) con grupos de opciones
+  tipo chip, preguntas SI/NO en renglon, bloques condicionales, filas de
+  etiquetas dinamicas y lista de hallazgos por tipo.
+*/
+
+/* ---------- Grupos de opciones (radio / checkbox) ---------- */
+.chip-set{display:flex; flex-wrap:wrap; gap:8px;}
+.chip{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  min-height:var(--touch-target-min);
+  padding:8px 12px;
+  border:1px solid var(--line);
+  border-radius:2px;
+  background:#fff;
+  color:var(--ink);
+  font-size:13.5px;
+  font-weight:400;
+  line-height:1.3;
+  cursor:pointer;
+  transition:background .15s ease, border-color .15s ease;
+}
+.field .chip{font-size:13.5px; color:var(--ink); font-weight:400;}
+.chip:hover{border-color:var(--amber);}
+.chip input,
+.field .chip input{
+  width:16px;
+  height:16px;
+  margin:0;
+  padding:0;
+  border:0;
+  flex-shrink:0;
+  accent-color:var(--ocean-deep);
+}
+.chip:has(input:checked){
+  border-color:var(--ocean-deep);
+  background:var(--sand);
+  box-shadow:inset 0 0 0 1px var(--ocean-deep);
+}
+.chip:has(input:focus-visible){
+  outline:var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset:2px;
+}
+.field.has-error .chip-set .chip{border-color:var(--coral);}
+
+/* ---------- Preguntas SI / NO en renglon ---------- */
+.pregunta{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px 16px;
+  flex-wrap:wrap;
+  padding:6px 0;
+}
+.pregunta-texto{flex:1 1 260px; font-size:13.5px; color:var(--ink); line-height:1.4;}
+.pregunta .chip-toggle{flex:0 0 168px;}
+
+/* ---------- Bloques condicionales ---------- */
+.cond-block{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  border-left:2px solid var(--sand-dark);
+  padding:4px 0 4px 14px;
+  margin-left:2px;
+}
+.cond-block.field-grid{display:grid;}
+p.cond-block{display:block;}
+.cond-block[hidden]{display:none;}
+
+/* ---------- Etiquetas dinamicas (aleta / PIT) ---------- */
+.etiqueta-list{display:flex; flex-direction:column; gap:10px;}
+.etiqueta-row{
+  display:grid;
+  grid-template-columns:1fr 1.4fr auto;
+  gap:10px;
+  align-items:end;
+  padding:12px;
+  border:1px solid var(--sand-dark);
+  border-radius:var(--radius-card);
+  background:var(--paper);
+}
+.etiqueta-row .field input{background:#fff;}
+
+/* ---------- Hallazgos por tipo (material / heridas) ---------- */
+.hallazgo-list{display:flex; flex-direction:column;}
+.hallazgo{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  padding:12px 0;
+  border-top:1px solid var(--sand-dark);
+}
+.hallazgo:first-child{border-top:none; padding-top:0;}
+
+/* ---------- Contenido GI ---------- */
+.gi-list{display:flex; flex-direction:column; gap:12px;}
+fieldset.gi-row{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  min-width:0;
+  margin:0;
+  padding:12px;
+  border:1px solid var(--sand-dark);
+  border-radius:var(--radius-card);
+  background:var(--paper);
+}
+.gi-row legend{padding:0 4px; font-size:13px; font-weight:600; color:var(--ocean-deep);}
+
+/* ---------- Selector de varamiento (Necropsia) ---------- */
+.select-row{display:flex; gap:10px; align-items:stretch;}
+.select-row select{flex:1; min-width:0;}
+.select-row .btn{white-space:nowrap;}
+
+.hint.is-aviso{color:var(--amber-deep);}
+
+.field textarea.textarea-largo{min-height:180px;}
+
+/* ---------- Estados en listados ---------- */
+.pill.is-ok{background:#E6EFE9; color:var(--ocean-deep);}
+.pill.is-pendiente{background:#FBF1DE; color:var(--amber-deep);}
+.pill.is-na{background:var(--sand); color:var(--ink-soft);}
+
+/* ---------- Responsive ---------- */
+@media (max-width:760px){
+  .etiqueta-row{grid-template-columns:1fr;}
+  .etiqueta-row .btn{width:100%;}
+  .pregunta .chip-toggle{flex:1 1 100%;}
+  .select-row{flex-direction:column;}
+  .cond-block{padding-left:10px;}
+}
+
+@media (max-width:480px){
+  .chip{flex:1 1 calc(50% - 8px);}
+  .chip-set .chip:only-child{flex-basis:100%;}
+}

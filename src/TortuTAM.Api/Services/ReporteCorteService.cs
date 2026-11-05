@@ -19,6 +19,8 @@ public class ReporteCorteService(DominioDbContext dominioDb) : IReporteCorteServ
 
     private sealed record FichaNido(int Id, int PlayaId, string? Corral, string? NumeroNido, byte? Uso, short? Huevos);
 
+    private sealed record VaramientoReporte(int? PlayaId, string? EspecieCodigo, string? Sexo, bool Vivo);
+
     private sealed record Limpieza(int? PlayaId, byte? Uso, long Vivas, long Huevos);
 
     private static bool EsVaramiento(byte? accion) => accion is AccionVarada or AccionMuerta;
@@ -68,7 +70,30 @@ public class ReporteCorteService(DominioDbContext dominioDb) : IReporteCorteServ
             .Select(f => new FichaNido(f.Id, f.PlayaId, f.Corral, f.NumeroNido, f.UsoNidoCodigo, f.HuevosColectados))
             .ToList();
 
-        var varamientos = fichas.Where(f => EsVaramiento(f.AccionCodigo)).ToList();
+        // Los varamientos conviven en dos fuentes (ver docs/planteamiento.md):
+        // los códigos 9/10 de accion_codigo en fichas y la ficha propia de
+        // varamiento (formato NOAA). El sexo de esta última sale de su
+        // necropsia, si la tiene.
+        var varamientosFichas = fichas
+            .Where(f => EsVaramiento(f.AccionCodigo))
+            .Select(f => new VaramientoReporte(f.PlayaId, f.EspecieCodigo, f.Sexo, f.AccionCodigo == AccionVarada));
+
+        var varamientosQuery = dominioDb.Varamientos.AsNoTracking()
+            .Where(v => v.FechaVaramiento >= inicio && v.FechaVaramiento <= fechaCorte);
+        if (playaId is not null)
+        {
+            varamientosQuery = varamientosQuery.Where(v => v.PlayaId == playaId);
+        }
+
+        var varamientosNoaa = await varamientosQuery
+            .Select(v => new VaramientoReporte(
+                v.PlayaId,
+                v.EspecieCodigo,
+                v.Necropsia != null ? v.Necropsia.Sexo : null,
+                v.CondicionCodigo == "vivo"))
+            .ToListAsync(cancellationToken);
+
+        var varamientos = varamientosFichas.Concat(varamientosNoaa).ToList();
 
         var limpiezasBase = await (
             from fl in dominioDb.FichasLimpieza.AsNoTracking()
@@ -139,8 +164,8 @@ public class ReporteCorteService(DominioDbContext dominioDb) : IReporteCorteServ
                 .Select(g => new ReporteVaramientoResponse(
                     g.Key.EspecieCodigo,
                     g.Key.Sexo,
-                    g.Count(v => v.AccionCodigo == AccionVarada),
-                    g.Count(v => v.AccionCodigo == AccionMuerta)))
+                    g.Count(v => v.Vivo),
+                    g.Count(v => !v.Vivo)))
                 .OrderBy(v => v.EspecieCodigo)
                 .ThenBy(v => v.Sexo)
                 .ToList();
