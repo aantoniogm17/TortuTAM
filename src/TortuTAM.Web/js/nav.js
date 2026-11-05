@@ -1,5 +1,5 @@
 (function(){
-  var views = ['panel', 'nueva', 'fichas', 'limpieza', 'mapa'];
+  var views = ['panel', 'nueva', 'limpieza', 'varamientos', 'necropsia', 'fichas', 'mapa'];
 
   function showView(name){
     if(views.indexOf(name) === -1){ name = 'panel'; }
@@ -20,6 +20,14 @@
 
     if(window.history && history.replaceState){
       history.replaceState(null, '', '#' + name);
+    }
+
+    // Aviso para que las vistas refresquen datos al mostrarse (p. ej. la
+    // lista de varamientos pendientes en Necropsia) sin acoplarse a nav.js.
+    try{
+      window.dispatchEvent(new CustomEvent('tortutam:vista-cambio', { detail: { vista: name } }));
+    }catch(e){
+      /* CustomEvent no disponible: las vistas cargan sus datos al iniciar. */
     }
   }
 

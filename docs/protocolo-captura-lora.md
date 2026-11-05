@@ -153,7 +153,7 @@ Esto es distinto al esquema actual del repositorio, donde "varada viva"/"varada 
 
 1. **Código de especie de la lora**: resuelto — se sembró `cat_especies` usando `lk` (protocolo oficial), no `LO` como en el esquema heredado (migración 0017).
 2. **`cat_uso_nido` incompleto**: resuelto — se agregaron los códigos 10 (Muerta, para varamientos) y 13 (Sólo nido sin tortuga - picado) (migración 0015).
-3. **Varamientos como tabla propia**: decisión tomada — se mantienen como están (valores 9/10 de `accion_codigo` dentro de `fichas`), sin tabla propia por ahora.
+3. **Varamientos como tabla propia**: resuelto — los varamientos tienen su propia tabla `varamientos` (ficha NOAA) y la necropsia se anexa en `necropsias`. Los valores 9/10 de `accion_codigo` en `fichas` se conservan y conviven con la tabla nueva (ver `docs/planteamiento.md`).
 4. **Campos de clasificación de nidada ausentes**: resuelto — se agregaron `protegido` y `compl_div_jun` a `fichas` (migración 0018), y `pasa` a `fichas_limpieza` (migración 0019).
 5. **Códigos 1/2 (Corral) y 3/4 (Caja)**: sigue sin resolverse. No se agregaron los códigos 2 y 4 a `cat_uso_nido` hasta saber qué los distingue de 1 y 3.
 

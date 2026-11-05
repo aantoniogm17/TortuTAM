@@ -1,7 +1,8 @@
 /*
   Cliente HTTP compartido hacia la API de TortuTAM. Pensado para que las
-  vistas "Fichas" (#12), "Limpieza de nido" (#13) y "Mapa de nidos" (#14)
-  reutilicen TortuTAM.api en lugar de repetir fetch() en cada una.
+  vistas "Fichas" (#12), "Limpieza de nido" (#13), "Mapa de nidos" (#14),
+  "Varamientos" y "Necropsia" reutilicen TortuTAM.api en lugar de repetir
+  fetch() en cada una.
 
   El GPS es siempre obligatorio al crear una limpieza (a diferencia de la
   ficha de anidacion, donde solo es obligatorio si hay PIT); esa validacion
@@ -39,6 +40,23 @@
     return response.json().catch(function(){ return null; });
   }
 
+  // Un 401 con token significa que la sesion guardada ya no es valida
+  // (vencida, o firmada con otra llave). js/auth.js solo revisa que exista
+  // un token, asi que sin esto la app se queda mostrando errores 401 sin
+  // volver al login. Se borra la sesion y se recarga una sola vez; los
+  // registros pendientes de la cola offline siguen en IndexedDB.
+  var sesionCerrada = false;
+  function cerrarSesionVencida(){
+    if(sesionCerrada) return;
+    sesionCerrada = true;
+    try{
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem('tortutam_nombre_completo');
+      localStorage.removeItem('tortutam_roles');
+    }catch(e){ /* sin localStorage no habia sesion que borrar */ }
+    location.reload();
+  }
+
   function request(path, options){
     options = options || {};
     var isFormData = (typeof FormData !== 'undefined') && (options.body instanceof FormData);
@@ -55,6 +73,9 @@
       headers: headers,
       body: body
     }).then(function(response){
+      if(response.status === 401 && headers['Authorization'] && path.indexOf('/auth/') !== 0){
+        cerrarSesionVencida();
+      }
       if(!response.ok){
         return parseErrorBody(response).then(function(data){
           var mensaje = (data && (data.mensaje || data.title)) || ('El servidor respondio con un error (' + response.status + ').');
@@ -119,7 +140,7 @@
 
     subirFoto: function(fichaId, file){
       var formData = new FormData();
-      formData.append('foto', file);
+      formData.append('archivos', file);
       return request('/fichas/' + fichaId + '/fotos', { method:'POST', body: formData });
     },
 
@@ -133,6 +154,60 @@
 
     obtenerLimpieza: function(id){
       return request('/limpiezas/' + id);
+    },
+
+    // headers es opcional, igual que en crearFicha: la cola offline reenvia
+    // el mismo Idempotency-Key en cada reintento.
+    crearVaramiento: function(payload, headers){
+      return request('/varamientos', { method:'POST', body: payload, headers: headers });
+    },
+
+    listarVaramientos: function(filtros){
+      return request('/varamientos' + buildQueryString(filtros));
+    },
+
+    obtenerVaramiento: function(id){
+      return request('/varamientos/' + id);
+    },
+
+    // Acepta un File o un arreglo de File; cada foto se manda en su propio
+    // POST multipart (campo "archivos", el nombre del parámetro en la API), igual que las fotos de fichas.
+    subirFotosVaramiento: function(varamientoId, fotos){
+      function subirUna(file){
+        var formData = new FormData();
+        formData.append('archivos', file);
+        return request('/varamientos/' + varamientoId + '/fotos', { method:'POST', body: formData });
+      }
+      if(Array.isArray(fotos)){ return Promise.all(fotos.map(subirUna)); }
+      return subirUna(fotos);
+    },
+
+    // Descarga el archivo de una foto con el token de sesion y lo devuelve
+    // como Blob, para mostrarlo con URL.createObjectURL (un <img src> directo
+    // no manda el header Authorization).
+    obtenerArchivoFotoVaramiento: function(varamientoId, fotoId){
+      return fetch(API_BASE + '/varamientos/' + varamientoId + '/fotos/' + fotoId + '/archivo', {
+        headers: buildHeaders()
+      }).then(function(response){
+        if(!response.ok){
+          var error = new Error('No se pudo descargar la foto (' + response.status + ').');
+          error.status = response.status;
+          throw error;
+        }
+        return response.blob();
+      });
+    },
+
+    crearNecropsia: function(payload){
+      return request('/necropsias', { method:'POST', body: payload });
+    },
+
+    listarNecropsias: function(filtros){
+      return request('/necropsias' + buildQueryString(filtros));
+    },
+
+    obtenerNecropsia: function(id){
+      return request('/necropsias/' + id);
     },
 
     obtenerEstadisticasPanel: function(limite){
