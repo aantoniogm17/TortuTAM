@@ -35,6 +35,17 @@ jobs:
           sed -i "s/CACHE_VERSION = '.*'/CACHE_VERSION = '${SHA_CORTO}'/" src/TortuTAM.Web/sw.js
           echo "CACHE_VERSION estampada en ${SHA_CORTO}"
 
+      # js/config.local.js esta versionado para el desarrollo local (apunta la
+      # API a http://localhost:5034/api). En produccion sitio y API comparten
+      # origen, asi que debe quedar vacio y api.js usa /api por defecto.
+      - name: Dejar vacio config.local.js para produccion
+        run: |
+          printf '%s\n' '// Produccion: mismo origen, api.js usa /api por defecto.' > src/TortuTAM.Web/js/config.local.js
+          if grep -q localhost src/TortuTAM.Web/js/config.local.js; then
+            echo "config.local.js sigue apuntando a localhost" >&2
+            exit 1
+          fi
+
       - name: Configurar llave SSH
         run: |
           mkdir -p ~/.ssh
@@ -44,15 +55,20 @@ jobs:
 
       - name: Copiar backend al VPS
         run: |
-          rsync -az --delete -e "ssh -i ~/.ssh/deploy_key" \
-            publish/api/ "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.VPS_API_PATH }}/"
+          rsync -rltz --delete --no-perms --omit-dir-times -e "ssh -i ~/.ssh/deploy_key" \
+            publish/api/"${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.VPS_API_PATH }}/"
 
       - name: Copiar frontend al VPS
         run: |
-          rsync -az --delete -e "ssh -i ~/.ssh/deploy_key" \
-            src/TortuTAM.Web/ "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.VPS_WEB_PATH }}/"
+          rsync -rltz --delete --no-perms --omit-dir-times -e "ssh -i ~/.ssh/deploy_key" \
+            src/TortuTAM.Web/"${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.VPS_WEB_PATH }}/"
 
       - name: Reiniciar el servicio de la API
         run: |
           ssh -i ~/.ssh/deploy_key "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" \
             "sudo systemctl restart tortutam-api"
+
+      - name: Verificar que el frontend publicado no apunte a localhost
+        run: |
+          ssh -i ~/.ssh/deploy_key "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" \
+            "! grep -q localhost '${{ secrets.VPS_WEB_PATH }}/js/config.local.js'"
