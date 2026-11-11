@@ -56,12 +56,12 @@ jobs:
       - name: Copiar backend al VPS
         run: |
           rsync -rltz --delete --no-perms --omit-dir-times -e "ssh -i ~/.ssh/deploy_key" \
-            publish/api/"${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.VPS_API_PATH }}/"
+            publish/api/ "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.VPS_API_PATH }}/"
 
       - name: Copiar frontend al VPS
         run: |
           rsync -rltz --delete --no-perms --omit-dir-times -e "ssh -i ~/.ssh/deploy_key" \
-            src/TortuTAM.Web/"${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.VPS_WEB_PATH }}/"
+            src/TortuTAM.Web/ "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.VPS_WEB_PATH }}/"
 
       - name: Reiniciar el servicio de la API
         run: |
