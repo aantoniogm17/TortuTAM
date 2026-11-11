@@ -1,0 +1,3 @@
+# Respaldo diario de la base a las 03:30. Instalar en /etc/cron.d/tortutam-backup
+# (ver deploy/tortutam-backup.sh). El log queda en /var/log/tortutam-backup.log.
+30 3 * * * root /usr/local/bin/tortutam-backup.sh >> /var/log/tortutam-backup.log 2>&1
