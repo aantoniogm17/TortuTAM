@@ -16,7 +16,9 @@ Description=TortuTAM API (ASP.NET Core)
 After=network.target mssql-server.service
 
 [Service]
-Type=notify
+# simple y no notify: la API no integra systemd (UseSystemd), asi que nunca
+# enviaria la notificacion de "listo" y el arranque expiraria.
+Type=simple
 WorkingDirectory=/opt/tortutam/api
 ExecStart=/usr/bin/dotnet /opt/tortutam/api/TortuTAM.Api.dll
 EnvironmentFile=/etc/tortutam/api.env
